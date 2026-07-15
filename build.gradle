@@ -1,0 +1,52 @@
+allprojects {
+    group = 'dev.kairos.ui'
+    version = '0.1.0-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 8
+    }
+}
+
+project(':ui-core') {
+    dependencies { api project(':ui-api') }
+}
+
+project(':ui-components') {
+    dependencies {
+        api project(':ui-api')
+        api project(':ui-core')
+    }
+}
+
+project(':platform-api') {
+    dependencies { api project(':ui-api') }
+}
+
+project(':platform-1.12.2-forge') {
+    dependencies { api project(':platform-api') }
+}
+
+project(':platform-1.20.1-common') {
+    dependencies { api project(':platform-api') }
+}
+
+project(':examples:modern-clickgui') {
+    dependencies {
+        implementation project(':ui-components')
+        implementation project(':platform-api')
+    }
+}

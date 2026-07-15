@@ -1,0 +1,9 @@
+rootProject.name = 'kairos-ui-engine'
+
+include 'ui-api'
+include 'ui-core'
+include 'ui-components'
+include 'platform-api'
+include 'platform-1.12.2-forge'
+include 'platform-1.20.1-common'
+include 'examples:modern-clickgui'
