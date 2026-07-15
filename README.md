@@ -53,7 +53,8 @@ platform imports, and emits PNG/SVG previews under `out/verify/previews`.
 ## Minecraft endpoint build
 
 `minecraft-build` is independent so Forge mappings and downloads cannot destabilize
-the Java-8 engine build. With Gradle 9.2 plus JDK 8 and JDK 17 installed:
+the Java-8 engine build. With Gradle 9.2 running on JDK 21 plus JDK 8 and JDK 17
+available as compile toolchains:
 
 ```bash
 gradle -p minecraft-build :1.12.2-forge:build :1.20.1-forge:build

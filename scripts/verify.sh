@@ -40,8 +40,15 @@ mapfile -t TEST_SOURCES < <(find \
 "${JAVAC[@]}" --release 8 -encoding UTF-8 -cp "$MAIN" -d "$TEST" "${TEST_SOURCES[@]}"
 
 FORBIDDEN='import (net\.minecraft|net\.minecraftforge|net\.fabricmc|org\.lwjgl|com\.mojang)'
-if rg -n "$FORBIDDEN" \
-  "$ROOT/ui-api/src" "$ROOT/ui-core/src" "$ROOT/ui-components/src"; then
+if command -v rg >/dev/null 2>&1; then
+  FORBIDDEN_MATCHES=$(rg -n "$FORBIDDEN" \
+    "$ROOT/ui-api/src" "$ROOT/ui-core/src" "$ROOT/ui-components/src" || true)
+else
+  FORBIDDEN_MATCHES=$(grep -R -n -E "$FORBIDDEN" \
+    "$ROOT/ui-api/src" "$ROOT/ui-core/src" "$ROOT/ui-components/src" || true)
+fi
+if [[ -n "$FORBIDDEN_MATCHES" ]]; then
+  echo "$FORBIDDEN_MATCHES"
   echo "Forbidden platform import detected in shared UI modules" >&2
   exit 1
 fi
@@ -55,10 +62,17 @@ java -cp "$MAIN" dev.kairos.ui.example.WorkbenchExample
 java -cp "$MAIN" dev.kairos.ui.example.PreviewGenerator "$OUT/previews"
 java -Djava.awt.headless=true -cp "$MAIN" dev.kairos.ui.example.RasterPreviewGenerator "$OUT/previews"
 python3 "$ROOT/scripts/preprocess-smoke.py" "$ROOT" "$OUT/preprocess"
-rg -q 'extends GuiScreen' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
-! rg -q 'GuiGraphics|Minecraft.getInstance' "$OUT/preprocess/11202/dev/kairos/ui/minecraft"
-rg -q 'extends Screen' "$OUT/preprocess/12001/dev/kairos/ui/minecraft/KairosScreen.java"
-! rg -q 'GuiScreen|Minecraft.getMinecraft|org.lwjgl' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
+if command -v rg >/dev/null 2>&1; then
+  rg -q 'extends GuiScreen' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
+  ! rg -q 'GuiGraphics|Minecraft.getInstance' "$OUT/preprocess/11202/dev/kairos/ui/minecraft"
+  rg -q 'extends Screen' "$OUT/preprocess/12001/dev/kairos/ui/minecraft/KairosScreen.java"
+  ! rg -q 'GuiScreen|Minecraft.getMinecraft|org.lwjgl' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
+else
+  grep -q -E 'extends GuiScreen' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
+  ! grep -R -q -E 'GuiGraphics|Minecraft.getInstance' "$OUT/preprocess/11202/dev/kairos/ui/minecraft"
+  grep -q -E 'extends Screen' "$OUT/preprocess/12001/dev/kairos/ui/minecraft/KairosScreen.java"
+  ! grep -R -q -E 'GuiScreen|Minecraft.getMinecraft|org.lwjgl' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
+fi
 test -s "$OUT/previews/workbench.svg"
 test -s "$OUT/previews/panel-desktop.svg"
 test -s "$OUT/previews/hud.svg"

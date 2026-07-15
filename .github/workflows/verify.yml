@@ -36,11 +36,18 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Remember Java 17
+        run: echo "JAVA17_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - name: Install Java 21 Gradle runtime
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.2.0'
       - name: Compile Forge endpoint adapters
         run: >-
           gradle -p minecraft-build
-          -Dorg.gradle.java.installations.paths="$JAVA8_HOME,$JAVA_HOME"
+          -Dorg.gradle.java.installations.paths="$JAVA8_HOME,$JAVA17_HOME,$JAVA_HOME"
           :1.12.2-forge:compileJava :1.20.1-forge:compileJava
