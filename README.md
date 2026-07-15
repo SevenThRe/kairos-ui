@@ -18,21 +18,25 @@ same module model, visual primitives, typography, glass effects, and theme token
   those operations are batched and submitted.
 - Mode-specific settings use visibility rules and remain inside the selected module.
 
-## Modules
+## Implemented modules
 
 | Module | Responsibility |
 | --- | --- |
 | `ui-api` | Geometry, theme tokens, drawing and input contracts |
 | `ui-core` | Node tree, layout, focus, pointer capture and animation |
-| `ui-components` | Module/setting model and the Kairos three-column workbench |
+| `ui-components` | Settings, workbench, draggable panel desktop and HUD scenes |
 | `platform-api` | Screen, clock and render host boundary |
-| `platform-1.12.2-forge` | Legacy Forge/LWJGL2 integration boundary |
-| `platform-1.20.1-common` | Modern Screen/GLFW integration boundary |
-| `examples/modern-clickgui` | Version-free executable scene example |
+| `ui-render-opengl` | Frame planning, shape batches, font atlas packing and GLSL 1.20 resources |
+| `ui-preview-awt` / `ui-preview-svg` | Deterministic headless visual preview backends |
+| `platform-1.12.2-forge` | Tested LWJGL2 coordinate, key and scissor conversion |
+| `platform-1.20.1-common` | Tested GLFW coordinate, key and scissor conversion |
+| `minecraft-build` | Real EGT multi-version Forge screen/bootstrap for 1.12.2 and 1.20.1 |
+| `examples/modern-clickgui` | Executable dual-layout and HUD reference scenes |
 
-The platform projects intentionally do not pretend to contain Forge bindings yet.
-Those bindings must be implemented against the real Kairos repository and its chosen
-mappings/build system.
+The Minecraft build opens with `F8`; `F6` switches between the fixed workbench and
+floating panels. It includes a compatibility canvas so both endpoints remain usable
+without shaders. The OpenGL pipeline is the production path for SDF corners, atlas
+text and shared blur; its final Minecraft GL-state binding remains isolated from UI code.
 
 ## Verify without Gradle
 
@@ -42,13 +46,17 @@ The repository has no external runtime dependencies in this milestone. On a JDK:
 ./scripts/verify.sh
 ```
 
-The script compiles with `--release 8`, runs engine tests, scans core sources for
-forbidden platform imports, and executes the workbench example.
+The script compiles with `--release 8`, runs engine, component, renderer and endpoint
+mapping tests, checks both preprocessor branches, scans shared sources for forbidden
+platform imports, and emits PNG/SVG previews under `out/verify/previews`.
 
-## Next integration milestone
+## Minecraft endpoint build
 
-1. Map Kairos modules and values to `UiModule` and `UiSetting`.
-2. Implement `Legacy112PlatformHost` using Forge 1.12.2 `GuiScreen` and LWJGL2 input.
-3. Implement the first OpenGL 2.1 command renderer with scissor and state restoration.
-4. Add font atlas, SDF rounded rectangles, shared blur pass, and capability fallback.
-5. Port the host to the current Kairos Minecraft version without modifying core UI.
+`minecraft-build` is independent so Forge mappings and downloads cannot destabilize
+the Java-8 engine build. With Gradle 9.2 plus JDK 8 and JDK 17 installed:
+
+```bash
+gradle -p minecraft-build :1.12.2-forge:build :1.20.1-forge:build
+```
+
+GitHub Actions performs endpoint compilation in addition to the dependency-free engine verification.

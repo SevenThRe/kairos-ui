@@ -5,6 +5,7 @@ import dev.kairos.ui.api.geometry.Rect;
 import dev.kairos.ui.api.geometry.Size;
 import dev.kairos.ui.api.input.EventResult;
 import dev.kairos.ui.api.input.PointerEvent;
+import dev.kairos.ui.api.input.UiKeyEvent;
 import dev.kairos.ui.api.render.UiCanvas;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +46,7 @@ public class UiNode {
 
     protected void render(UiCanvas canvas) {}
     public EventResult onPointer(PointerEvent event) { return EventResult.IGNORED; }
+    public EventResult onKey(UiKeyEvent event) { return EventResult.IGNORED; }
 
     public UiNode hitTest(float x, float y) {
         if (!visible || !enabled || !bounds.contains(x, y)) return null;

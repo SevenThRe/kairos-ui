@@ -1,0 +1,10 @@
+[
+  {
+    "modid": "kairos_ui",
+    "name": "Kairos UI",
+    "description": "Cross-version native retained-mode UI engine demo.",
+    "version": "0.2.0",
+    "mcversion": "1.12.2",
+    "authorList": ["SevenThRe"]
+  }
+]

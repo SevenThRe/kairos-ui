@@ -36,6 +36,22 @@ project(':platform-api') {
     dependencies { api project(':ui-api') }
 }
 
+project(':ui-render-opengl') {
+    dependencies {
+        api project(':ui-api')
+        api project(':ui-core')
+        api project(':platform-api')
+    }
+}
+
+project(':ui-preview-svg') {
+    dependencies { api project(':ui-api') }
+}
+
+project(':ui-preview-awt') {
+    dependencies { api project(':ui-api') }
+}
+
 project(':platform-1.12.2-forge') {
     dependencies { api project(':platform-api') }
 }
@@ -48,5 +64,7 @@ project(':examples:modern-clickgui') {
     dependencies {
         implementation project(':ui-components')
         implementation project(':platform-api')
+        implementation project(':ui-preview-svg')
+        implementation project(':ui-preview-awt')
     }
 }
