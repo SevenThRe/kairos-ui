@@ -1,18 +1,17 @@
 # Kairos UI Engine
 
-Version-independent retained-mode UI foundations for a modern Minecraft client UI.
+Version-independent client UI foundations with a WebView ClickGUI and native HUD/ESP runtime.
 
-Kairos ships a finished modern default rather than an unstyled widget kit: blue-black
-glass surfaces, violet controls, compact floating categories, a three-column workbench,
-animated toast notifications, a right-aligned ModuleList, draggable HUD widgets, a dense
-competitive TargetHUD, and entity plus world-object ESP. Client authors can replace every
-ClickGUI palette, combat-HUD profile, ESP style, font ID, radius, spacing, blur and motion
-token without forking a component.
+Kairos ships a finished modern default rather than an unstyled widget kit: an offline
+HTML/CSS ClickGUI rendered by Chromium, blue-black glass surfaces, violet controls,
+animated notifications, a right-aligned ModuleList, HUD widgets, combat HUD primitives,
+and entity/world-object ESP foundations. Client authors can override the entire ClickGUI
+palette and typography with CSS and configure HUD/ESP styles without forking the runtime.
 
-The engine supports both accepted Kairos compositions: a fixed three-column workspace
-with category navigation, module cards, and settings edited in context; and a floating
-category-panel desktop that keeps traditional ClickGUI muscle memory. They share the
-same module model, visual primitives, typography, glass effects, and theme tokens.
+The production Forge 1.12.2 endpoint uses one WebView composition: category navigation,
+a compact module list, and an in-context settings inspector. The earlier native
+`MinecraftFallbackCanvas` path has been deleted and cannot reappear when WebView setup
+fails. Native HUD and ESP rendering remain separate because they execute every game frame.
 
 ## Design constraints
 
@@ -31,18 +30,17 @@ same module model, visual primitives, typography, glass effects, and theme token
 | --- | --- |
 | `ui-api` | Geometry, theme tokens, drawing and input contracts |
 | `ui-core` | Node tree, layout, focus, pointer capture and animation |
-| `ui-components` | Settings, workbench, panel desktop, modern HUD and competitive combat HUD |
+| `ui-components` | Module/setting model, modern HUD and competitive combat HUD foundations |
 | `ui-esp` | Entity/world-object snapshots, 2D projection, native 3D sink, boxes, health, equipment and tags |
 | `platform-api` | Screen, clock and render host boundary |
 | `ui-render-opengl` | Frame planning, shape batches, font atlas packing and GLSL 1.20 resources |
 | `ui-preview-awt` / `ui-preview-svg` | Deterministic headless visual preview backends |
 | `platform-1.12.2-forge` | Tested LWJGL2 coordinate, key and scissor conversion |
 | `platform-1.20.1-common` | Tested GLFW coordinate, key and scissor conversion |
-| `minecraft-build` | Real EGT multi-version Forge screen/bootstrap for 1.12.2 and 1.20.1 |
-| `examples/modern-clickgui` | Executable dual-layout and HUD reference scenes |
+| `minecraft-build` | EGT Forge endpoints, MCEF WebView host, secure JS bridge and bundled Web UI |
+| `examples/modern-clickgui` | Headless model/HUD reference scenes retained for engine tests |
 
-The Minecraft build opens/closes with `Right Ctrl`; `F6` switches between the fixed
-workbench and floating panels. `.kairos gui`, `!kairos gui`, `/kairos gui`, and other
+The Minecraft build opens/closes with `Right Ctrl`. `.kairos gui`, `!kairos gui`, `/kairos gui`, and other
 punctuation prefixes are recognized by the standalone bridge. Theme commands are:
 
 ```text
@@ -55,25 +53,25 @@ Custom theme files live in `.minecraft/kairos-ui/themes/*.properties`; the selec
 theme is persisted. Consuming clients can call `KairosMod.openGui()` or
 `KairosMod.handleCommand(message, prefix)` from an existing command manager.
 
-The Forge 1.12.2 `0.3.0` playable preview now uses a persistent live module manager.
+The Forge 1.12.2 `0.4.0` endpoint uses a persistent live module manager.
 Sprint, AutoJump, AutoRespawn, FastPlace, FullBright, PlayerESP, HUD, ModuleList,
 Coordinates, and Notifications are connected to Forge tick/render events and toggled by
 the same module objects displayed by Kairos. This is a clean-room Forge implementation;
 no LiquidBounce GPL source is copied into the repository.
 
-The endpoint compatibility canvas now preserves rounded geometry, tint, font scaling,
-scissor and interaction without shaders. The OpenGL pipeline remains the enhanced path
-for actual framebuffer blur, custom font atlases and batched SDF shapes.
+The ClickGUI requires the separate MCEF `1.12.2-1.11` Forge mod. Bundled assets are
+served only from `kairos://ui/`; bridge calls are origin checked and scheduled back onto
+Minecraft's client thread. Missing/virtual MCEF produces an explicit chat error—there is
+no native fallback. Copy `minecraft-build/web-theme.example.css` to
+`.minecraft/kairos-ui/web-theme.css` to override the Web UI theme.
 
 ## Preview truth
 
-The PNG/SVG files are rendered by the same Java scene classes, models and `UiCanvas`
-operations used by the endpoints; they are not AI mockups. Layout, colors, content,
-sorting, clipping and render-command structure therefore reflect code that exists.
-AWT uses a deterministic block-world backdrop and a CPU blur approximation. Entity and
-item slots are intentionally blank: native pixels require the endpoint to bind
-`GameVisualRenderer`; the layout and all surrounding pixels are already the production
-scene. See [docs/PREVIEWS.md](docs/PREVIEWS.md) for the exact parity matrix.
+The old Java ClickGUI PNG/SVG previews and their scene classes have been deleted because
+they no longer represented the endpoint. The production menu is exactly the bundled
+`index.html`, `app.css`, `theme.css`, and `app.js` rendered by MCEF and connected to the
+live Java bridge. Remaining generated PNG/SVG artifacts cover native HUD/ESP scene code
+only; they are not presented as ClickGUI screenshots. See [docs/PREVIEWS.md](docs/PREVIEWS.md).
 
 ## Guides
 

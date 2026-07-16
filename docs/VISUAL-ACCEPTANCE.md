@@ -26,11 +26,9 @@ Modern appearance is a milestone requirement, not a post-processing extra.
 - Base spacing unit is 4 px; common radius is 6–12 px; motion is 150–220 ms ease-out.
 - ClickGUI and HUD widgets use the same palette, typography, radius and motion tokens.
 
-## Layout parity
+## ClickGUI layout
 
-Both scene compositions are supported:
-
-- `ModernWorkbench`: fixed three-column navigation/module/settings workspace.
-- `PanelDesktop`: draggable category panels with inline module expansion.
-
-Visual primitives and setting components must be shared; only composition differs.
+The production WebView uses a fixed responsive composition: category sidebar, dense
+module list, and settings inspector. CSS custom properties are the ClickGUI design-token
+contract. A browser initialization failure must remain an explicit error and must never
+replace the UI with a native approximation.

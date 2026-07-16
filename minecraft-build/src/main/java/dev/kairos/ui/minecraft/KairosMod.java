@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 //#endif
 import net.minecraftforge.fml.common.Mod;
 //#if MC<11600
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //#endif
 //#if MC>=11600
@@ -34,7 +35,8 @@ import net.minecraft.util.text.TextComponentString;
 //#if MC>=11600
 //$$ @Mod(KairosMod.MOD_ID)
 //#else
-@Mod(modid = KairosMod.MOD_ID, name = "Kairos Client", version = "0.3.0", clientSideOnly = true)
+@Mod(modid = KairosMod.MOD_ID, name = "Kairos Client", version = "0.4.0", clientSideOnly = true,
+    dependencies = "required-after:mcef")
 //#endif
 public final class KairosMod {
     public static final String MOD_ID = "kairos_ui";
@@ -63,6 +65,14 @@ public final class KairosMod {
         MinecraftForge.EVENT_BUS.register(this);
         //#endif
     }
+
+    //#if MC<11600
+    @Mod.EventHandler
+    public void onPreInitialization(FMLPreInitializationEvent event) {
+        // Custom schemes must be registered before MCEF creates CefApp during Forge init.
+        KairosWebBridge.prepareScheme();
+    }
+    //#endif
 
     //#if MC<11600
     @SubscribeEvent
@@ -197,8 +207,28 @@ public final class KairosMod {
         //#endif
     }
 
+    static void reportWebEngineUnavailable() {
+        //#if MC>=11600
+        //$$ systemMessage("Kairos Web UI is unavailable: install the Forge 1.20.1 WebView adapter.");
+        //#else
+        systemMessage("Kairos Web UI is unavailable: MCEF 1.12.2-1.11 did not initialize. No native fallback is enabled.");
+        //#endif
+    }
+
+    private static boolean webUiAvailable() {
+        //#if MC>=11600
+        //$$ return false;
+        //#else
+        return KairosWebBridge.available();
+        //#endif
+    }
+
     /** Integration hook for a consuming client's own prefix-aware command manager. */
     public static void openGui() {
+        if (!webUiAvailable()) {
+            reportWebEngineUnavailable();
+            return;
+        }
         //#if MC>=11600
         //$$ Minecraft minecraft = Minecraft.getInstance();
         //$$ minecraft.execute(() -> minecraft.setScreen(new KairosScreen()));
@@ -213,10 +243,12 @@ public final class KairosMod {
     public static void toggleGui() {
         //#if MC>=11600
         //$$ Minecraft minecraft = Minecraft.getInstance();
-        //$$ minecraft.setScreen(minecraft.screen instanceof KairosScreen ? null : new KairosScreen());
+        //$$ if (minecraft.screen instanceof KairosScreen) minecraft.setScreen(null);
+        //$$ else openGui();
         //#else
         Minecraft minecraft = Minecraft.getMinecraft();
-        minecraft.displayGuiScreen(minecraft.currentScreen instanceof KairosScreen ? null : new KairosScreen());
+        if (minecraft.currentScreen instanceof KairosScreen) minecraft.displayGuiScreen(null);
+        else openGui();
         //#endif
     }
 }

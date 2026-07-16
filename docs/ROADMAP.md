@@ -7,12 +7,12 @@
 - deterministic animation
 - pointer capture and focus
 - version-independent module/settings model
-- fixed three-column Kairos workbench scene
+- fixed three-column Kairos WebView workspace
 - command-recording renderer and smoke tests
 
 ## M1 — interaction and dual composition (complete)
 
-- fixed workbench and draggable category panels
+- bundled HTML/CSS/JavaScript ClickGUI
 - search, focus, pointer capture, z-order, collapse and clipped scrolling
 - boolean, number, enum, range, multi-select, color, text and keybind settings
 - movable HUD scene and reference widgets
@@ -30,7 +30,7 @@
 - LWJGL2/GLFW input conversion and framebuffer scissor mapping tests
 - Forge 1.12.2 and Forge 1.20.1 EGT screen/bootstrap source
 - Java 8/17 endpoint CI compilation
-- compatibility renderer and F6 dual-layout switch
+- strict MCEF WebView host with no native fallback
 
 ## M4 — client visual systems (complete)
 

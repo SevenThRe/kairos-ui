@@ -9,11 +9,26 @@ plugins {
 group = "dev.kairos.ui"
 version = rootProject.version
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            ivy("https://github.com/montoyo/mcef/releases/download") {
+                patternLayout { artifact("[revision]/[artifact]-[revision]-api.[ext]") }
+                metadataSources { artifact() }
+            }
+        }
+        filter { includeModule("net.montoyo", "mcef") }
+    }
+}
+
 loom.noServerRunConfigs()
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(if (platform.mcVersion < 11700) 8 else 17))
 
 dependencies {
     implementation(project(":engine"))
+    if (platform.mcVersion < 11300) {
+        compileOnly("net.montoyo:mcef:1.12.2-1.11")
+    }
 }
 
 evaluationDependsOn(":engine")

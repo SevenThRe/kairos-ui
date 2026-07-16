@@ -69,27 +69,31 @@ java -cp "$MAIN:$TEST" dev.kairos.ui.platform.KairosClientCommandTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.ThemeDirectoryTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.legacy.Legacy112AdapterTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.modern.Modern120AdapterTest
-java -cp "$MAIN" dev.kairos.ui.example.WorkbenchExample
 java -cp "$MAIN" dev.kairos.ui.example.PreviewGenerator "$OUT/previews"
 java -Djava.awt.headless=true -cp "$MAIN" dev.kairos.ui.example.RasterPreviewGenerator "$OUT/previews"
 python3 "$ROOT/scripts/preprocess-smoke.py" "$ROOT" "$OUT/preprocess"
 if command -v rg >/dev/null 2>&1; then
   rg -q 'extends GuiScreen' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
+  rg -q 'createBrowser' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
+  rg -q 'implements IJSQueryHandler' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosWebBridge.java"
   ! rg -q 'GuiGraphics|Minecraft.getInstance' "$OUT/preprocess/11202/dev/kairos/ui/minecraft"
   rg -q 'extends Screen' "$OUT/preprocess/12001/dev/kairos/ui/minecraft/KairosScreen.java"
-  ! rg -q 'GuiScreen|Minecraft.getMinecraft|org.lwjgl' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
+  ! rg -q 'GuiScreen|Minecraft.getMinecraft|org.lwjgl|net.montoyo' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
 else
   grep -q -E 'extends GuiScreen' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
+  grep -q -E 'createBrowser' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosScreen.java"
+  grep -q -E 'implements IJSQueryHandler' "$OUT/preprocess/11202/dev/kairos/ui/minecraft/KairosWebBridge.java"
   ! grep -R -q -E 'GuiGraphics|Minecraft.getInstance' "$OUT/preprocess/11202/dev/kairos/ui/minecraft"
   grep -q -E 'extends Screen' "$OUT/preprocess/12001/dev/kairos/ui/minecraft/KairosScreen.java"
-  ! grep -R -q -E 'GuiScreen|Minecraft.getMinecraft|org.lwjgl' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
+  ! grep -R -q -E 'GuiScreen|Minecraft.getMinecraft|org.lwjgl|net.montoyo' "$OUT/preprocess/12001/dev/kairos/ui/minecraft"
 fi
-test -s "$OUT/previews/workbench.svg"
-test -s "$OUT/previews/panel-desktop.svg"
+test ! -e "$ROOT/minecraft-build/src/main/java/dev/kairos/ui/minecraft/MinecraftFallbackCanvas.java"
+test -s "$ROOT/minecraft-build/src/main/resources/assets/kairos_ui/web/index.html"
+test -s "$ROOT/minecraft-build/src/main/resources/assets/kairos_ui/web/app.css"
+test -s "$ROOT/minecraft-build/src/main/resources/assets/kairos_ui/web/app.js"
+if command -v node >/dev/null 2>&1; then node --check "$ROOT/minecraft-build/src/main/resources/assets/kairos_ui/web/app.js"; fi
 test -s "$OUT/previews/hud.svg"
 test -s "$OUT/previews/esp.svg"
-test -s "$OUT/previews/workbench.png"
-test -s "$OUT/previews/panel-desktop.png"
 test -s "$OUT/previews/hud.png"
 test -s "$OUT/previews/esp.png"
 test -s "$OUT/previews/combat-hud.png"

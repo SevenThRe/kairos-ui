@@ -2,30 +2,31 @@
 
 ## Product surface
 
-The engine exposes both accepted compositions over the same data model:
+The production ClickGUI exposes one WebView composition over the shared data model:
 
 1. left category navigation;
 2. center module-card list;
 3. right settings inspector with in-context mode-specific settings;
 4. shared design tokens for ClickGUI and HUD widgets.
 
-`ModernWorkbench` implements that fixed layout. `PanelDesktop` provides draggable,
-collapsible, z-ordered category windows with inline module expansion, clipped scrolling,
-pointer capture, and interactive boolean/enum/number/range controls. HUD widgets reuse
-the same theme and can be moved independently. `ThemeRegistry` hot-switches all bound
-scenes and `ThemeDirectory` loads/persists user packs without Minecraft leaking inward.
+Bundled HTML/CSS/JavaScript implements the layout. `KairosWebBridge` serializes the live
+module catalog, accepts validated toggle/setting actions, and schedules mutations on the
+client thread. `KairosResourceScheme` exposes only the bundled asset directory and one
+explicit user theme file. HUD widgets continue to use native rendering and `ThemeRegistry`.
+The deleted Minecraft canvas is not a fallback path; WebView failure is reported directly.
 
 ## Boundary rule
 
 Dependencies point inward: Minecraft/loader → platform adapter → `platform-api` →
 `ui-components` → `ui-core` → `ui-api`.
 
-Core code cannot import Minecraft or a loader. A CI source scan enforces the initial
+Core code cannot import Minecraft or a loader. The MCEF host stays in `minecraft-build`.
+A CI source scan enforces the initial
 rule; later it should be replaced with an ArchUnit test.
 
 ## Rendering
 
-The UI records high-level commands such as rounded rectangle, text, image and clip.
+Native HUD/ESP scenes record high-level commands such as rounded rectangle, text, image and clip.
 `CommandRenderer` preserves order, batches adjacent shapes, routes text/images to
 dedicated draws, and executes at most one shared blur capture per frame.
 Modern renderers may use newer submission APIs, but visual semantics stay identical.
@@ -37,7 +38,8 @@ Capability levels:
 - Level 2: framebuffer-backed shared blur;
 - Level 3: optional instanced/batched enhancements.
 
-Missing capabilities affect effects, never layout or interaction.
+The ClickGUI does not use this capability ladder: Chromium owns its layout and text,
+while the endpoint owns the Minecraft framebuffer blur behind its transparent surface.
 
 ## Fonts
 

@@ -1,5 +1,15 @@
 # Theme packs
 
+## Web ClickGUI
+
+The production ClickGUI uses CSS variables. Copy `minecraft-build/web-theme.example.css`
+to `.minecraft/kairos-ui/web-theme.css`; the private resource scheme loads it after the
+bundled defaults. Accent, typeface, radii, surfaces and text colors can therefore change
+without recompiling Java. The theme button also cycles the bundled violet, cyan and rose
+variants and stores the selection in the local MCEF profile.
+
+The properties system below remains the native HUD/ESP theme API.
+
 Kairos keeps theme data separate from components. A theme controls typography IDs,
 the complete surface/text/accent palette, window/component radius, spacing, glass blur,
 and fast motion duration. `ThemeRegistry.kairosDefaults()` includes:
@@ -38,7 +48,6 @@ ThemePack custom = new ThemePack(
 themes.register(custom);
 themes.activate("customer-purple");
 
-ModernWorkbench gui = new ModernWorkbench(catalog, state, themes);
 HudScene hud = new HudScene(hudModel, themes);
 ```
 

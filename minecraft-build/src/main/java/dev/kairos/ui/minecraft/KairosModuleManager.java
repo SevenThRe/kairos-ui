@@ -97,6 +97,33 @@ final class KairosModuleManager implements RuntimeUiModule.StateListener {
         return true;
     }
 
+    boolean setSetting(String moduleId, String settingId, String rawValue) {
+        RuntimeUiModule module = modules.get(moduleId == null ? "" : moduleId.toLowerCase());
+        if (module == null || settingId == null) return false;
+        for (UiSetting<?> setting : module.getSettings()) {
+            if (!settingId.equals(setting.getId())) continue;
+            try {
+                if (setting instanceof BooleanSetting) {
+                    if (!"true".equalsIgnoreCase(rawValue) && !"false".equalsIgnoreCase(rawValue)) return false;
+                    ((BooleanSetting) setting).setValue(Boolean.valueOf(rawValue));
+                } else if (setting instanceof NumberSetting) {
+                    NumberSetting number = (NumberSetting) setting;
+                    double value = Double.parseDouble(rawValue);
+                    value = Math.max(number.getMin(), Math.min(number.getMax(), value));
+                    value = number.getMin() + Math.round((value - number.getMin()) / number.getStep()) * number.getStep();
+                    number.setValue(value);
+                } else {
+                    return false;
+                }
+                save();
+                return true;
+            } catch (IllegalArgumentException exception) {
+                return false;
+            }
+        }
+        return false;
+    }
+
     @Override public void onStateChanged(RuntimeUiModule module, boolean enabled) {
         if ("full-bright".equals(module.getId()) && !enabled) restoreGamma();
         save();
@@ -313,6 +340,10 @@ final class KairosModuleManager implements RuntimeUiModule.StateListener {
             for (RuntimeUiModule module : modules.values()) {
                 String value = properties.getProperty("module." + module.getId() + ".enabled");
                 if (value != null) module.loadEnabled(Boolean.parseBoolean(value));
+                for (UiSetting<?> setting : module.getSettings()) {
+                    String settingValue = properties.getProperty(settingKey(module, setting));
+                    if (settingValue != null) loadSetting(setting, settingValue);
+                }
             }
         } catch (IOException exception) {
             System.err.println("Kairos module config load failed: " + exception.getMessage());
@@ -325,12 +356,31 @@ final class KairosModuleManager implements RuntimeUiModule.StateListener {
         Properties properties = new Properties();
         for (RuntimeUiModule module : modules.values()) {
             properties.setProperty("module." + module.getId() + ".enabled", String.valueOf(module.isEnabled()));
+            for (UiSetting<?> setting : module.getSettings()) {
+                properties.setProperty(settingKey(module, setting), String.valueOf(setting.getValue()));
+            }
         }
         try {
             FileOutputStream output = new FileOutputStream(configFile);
             try { properties.store(output, "Kairos runtime modules"); } finally { output.close(); }
         } catch (IOException exception) {
             System.err.println("Kairos module config save failed: " + exception.getMessage());
+        }
+    }
+
+    private static String settingKey(RuntimeUiModule module, UiSetting<?> setting) {
+        return "module." + module.getId() + ".setting." + setting.getId();
+    }
+
+    private static void loadSetting(UiSetting<?> setting, String value) {
+        try {
+            if (setting instanceof BooleanSetting) {
+                ((BooleanSetting) setting).setValue(Boolean.valueOf(value));
+            } else if (setting instanceof NumberSetting) {
+                ((NumberSetting) setting).setValue(Double.valueOf(value));
+            }
+        } catch (IllegalArgumentException ignored) {
+            // Keep the declared default when a config entry is stale or malformed.
         }
     }
 }
