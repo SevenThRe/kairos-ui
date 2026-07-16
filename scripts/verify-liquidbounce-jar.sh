@@ -34,15 +34,25 @@ require_entry "assets/mcef/letsencryptauthorityx3.crt"
 require_entry "mcef-coremod.jar"
 require_entry "META-INF/LICENSE-LiquidBounce-GPL-3.0.txt"
 
-MODULE_CLASSES="$(grep -c '^net/ccbluex/liquidbounce/features/module/modules/.\+\.class$' <<< "$ENTRIES")"
+MODULE_CLASSES="$(grep -Ec '^net/ccbluex/liquidbounce/features/module/modules/.+\.class$' <<< "$ENTRIES" || true)"
 if (( MODULE_CLASSES < 100 )); then
   echo "expected the real LiquidBounce module set, found only $MODULE_CLASSES module classes" >&2
   exit 4
 fi
 
-MANIFEST="$(unzip -p "$JAR" META-INF/MANIFEST.MF)"
-grep -Fq 'FMLCorePlugin: net.ccbluex.liquidbounce.injection.forge.TransformerLoader' <<< "$MANIFEST"
-grep -Fq 'ContainedDeps: mcef-coremod.jar' <<< "$MANIFEST"
+unfold_manifest() {
+  tr -d '\r' | sed ':join;N;$!b join;s/\n //g'
+}
+
+MANIFEST="$(unzip -p "$JAR" META-INF/MANIFEST.MF | unfold_manifest)"
+if ! grep -Fq 'FMLCorePlugin: net.ccbluex.liquidbounce.injection.forge.TransformerLoader' <<< "$MANIFEST"; then
+  echo "outer manifest is missing the LiquidBounce coremod" >&2
+  exit 6
+fi
+if ! grep -Fq 'ContainedDeps: mcef-coremod.jar' <<< "$MANIFEST"; then
+  echo "outer manifest is missing the MCEF ContainedDeps entry" >&2
+  exit 6
+fi
 
 if grep -Fqi 'required-after:mcef' < <(unzip -p "$JAR" mcmod.info); then
   echo "combined JAR still declares MCEF as an external required mod" >&2
@@ -53,10 +63,12 @@ COREMOD="$(mktemp)"
 trap 'rm -f "$COREMOD"' EXIT
 unzip -p "$JAR" mcef-coremod.jar > "$COREMOD"
 unzip -tq "$COREMOD"
-unzip -p "$COREMOD" META-INF/MANIFEST.MF | grep -Fq \
-  'FMLCorePlugin: net.montoyo.mcef.coremod.ShutdownPatcher'
+COREMOD_MANIFEST="$(unzip -p "$COREMOD" META-INF/MANIFEST.MF | unfold_manifest)"
+if ! grep -Fq 'FMLCorePlugin: net.montoyo.mcef.coremod.ShutdownPatcher' <<< "$COREMOD_MANIFEST"; then
+  echo "nested MCEF coremod manifest is invalid" >&2
+  exit 7
+fi
 
 echo "Verified $JAR"
 echo "LiquidBounce module classes: $MODULE_CLASSES"
 sha256sum "$JAR"
-
