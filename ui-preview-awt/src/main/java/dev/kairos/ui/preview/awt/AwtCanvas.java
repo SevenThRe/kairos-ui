@@ -5,6 +5,7 @@ import dev.kairos.ui.api.render.UiCanvas;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -32,12 +33,28 @@ public final class AwtCanvas implements UiCanvas {
     }
 
     public void paintBackdrop() {
-        GradientPaint gradient = new GradientPaint(0f, 0f, new Color(8, 16, 24),
-            image.getWidth(), image.getHeight(), new Color(24, 17, 36));
+        GradientPaint gradient = new GradientPaint(0f, 0f, new Color(25, 43, 57),
+            0f, image.getHeight(), new Color(8, 14, 18));
         graphics.setPaint(gradient);
         graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
-        graphics.setColor(new Color(118, 87, 246, 30));
-        graphics.fillOval(image.getWidth() / 2 - 320, image.getHeight() / 2 - 280, 640, 560);
+
+        // A deterministic, code-generated block world. It is only a preview
+        // backdrop: every UI pixel above it still comes from UiCanvas calls.
+        int horizon = image.getHeight() * 48 / 100;
+        graphics.setColor(new Color(36, 59, 51));
+        graphics.fillRect(0, horizon, image.getWidth(), image.getHeight() - horizon);
+        int block = 64;
+        for (int y = horizon; y < image.getHeight(); y += block) {
+            for (int x = -block; x < image.getWidth() + block; x += block) {
+                int parity = ((x / block) + (y / block)) & 1;
+                graphics.setColor(parity == 0 ? new Color(43, 64, 53) : new Color(34, 54, 45));
+                graphics.fillRect(x, y, block - 2, block - 2);
+                graphics.setColor(new Color(255, 255, 255, 8));
+                graphics.fillRect(x, y, block - 2, 2);
+            }
+        }
+        graphics.setColor(new Color(13, 22, 26, 118));
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
     }
 
     @Override public void fillRect(Rect rect, int argb) {
@@ -81,10 +98,15 @@ public final class AwtCanvas implements UiCanvas {
     }
 
     @Override public void text(String fontId, String text, float x, float baseline, float size, int argb) {
-        int style = fontId.contains("semibold") ? Font.BOLD : Font.PLAIN;
-        graphics.setFont(new Font("SansSerif", style, Math.max(1, i(size))));
+        graphics.setFont(font(fontId, size));
         graphics.setColor(new Color(argb, true));
         graphics.drawString(text, x, baseline);
+    }
+
+    @Override public float measureText(String fontId, String text, float size) {
+        if (text == null || text.isEmpty()) return 0f;
+        FontMetrics metrics = graphics.getFontMetrics(font(fontId, size));
+        return metrics.stringWidth(text);
     }
 
     @Override public void image(String textureId, Rect rect, int tintArgb) {
@@ -104,5 +126,10 @@ public final class AwtCanvas implements UiCanvas {
 
     public BufferedImage getImage() { return image; }
     public void dispose() { graphics.dispose(); }
+    private static Font font(String fontId, float size) {
+        int style = fontId.contains("semibold") ? Font.BOLD : Font.PLAIN;
+        String family = fontId.contains("mono") ? Font.MONOSPACED : Font.SANS_SERIF;
+        return new Font(family, style, Math.max(1, i(size)));
+    }
     private static int i(float value) { return Math.round(value); }
 }

@@ -9,6 +9,7 @@ import dev.kairos.ui.components.scene.WorkbenchState;
 import dev.kairos.ui.preview.svg.SvgCanvas;
 import dev.kairos.ui.components.hud.HudModel;
 import dev.kairos.ui.components.hud.HudScene;
+import dev.kairos.ui.esp.EspOverlayScene;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,18 +33,26 @@ public final class PreviewGenerator {
         write(new File(output, "workbench.svg"), workbenchSvg.toSvg());
 
         PanelDesktop panels = new PanelDesktop(catalog, theme);
-        panels.layout(new Rect(0f, 0f, 1280f, 720f));
+        panels.layout(new Rect(0f, 0f, 1600f, 900f));
         panels.getExpandedModules().add("kill-aura");
-        SvgCanvas panelSvg = new SvgCanvas(1280, 720);
+        SvgCanvas panelSvg = new SvgCanvas(1600, 900);
         panels.renderTree(panelSvg);
         write(new File(output, "panel-desktop.svg"), panelSvg.toSvg());
 
-        HudScene hud = new HudScene(new HudModel(), theme);
+        long previewNow = 100000L;
+        HudScene hud = new HudScene(new HudModel(previewNow), theme).setNowMillis(previewNow);
         hud.layout(new Rect(0f, 0f, 1280f, 720f));
         SvgCanvas hudSvg = new SvgCanvas(1280, 720);
         hudSvg.fillRect(new Rect(0f, 0f, 1280f, 720f), 0xFF0A1117);
         hud.renderTree(hudSvg);
         write(new File(output, "hud.svg"), hudSvg.toSvg());
+
+        EspOverlayScene esp = DemoEsp.create(theme);
+        esp.layout(new Rect(0f, 0f, 1280f, 720f));
+        SvgCanvas espSvg = new SvgCanvas(1280, 720);
+        espSvg.fillRect(new Rect(0f, 0f, 1280f, 720f), 0xFF111B20);
+        esp.renderTree(espSvg);
+        write(new File(output, "esp.svg"), espSvg.toSvg());
         System.out.println("SVG previews: " + output.getAbsolutePath());
     }
 

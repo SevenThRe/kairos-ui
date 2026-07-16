@@ -7,6 +7,8 @@ import dev.kairos.ui.api.input.PointerAction;
 import dev.kairos.ui.api.input.PointerEvent;
 import dev.kairos.ui.api.input.UiKeyEvent;
 import dev.kairos.ui.api.render.UiCanvas;
+import dev.kairos.ui.api.theme.ThemePack;
+import dev.kairos.ui.api.theme.ThemeRegistry;
 import dev.kairos.ui.api.theme.ThemeTokens;
 import dev.kairos.ui.components.model.ModuleCatalog;
 import dev.kairos.ui.components.model.UiCategory;
@@ -30,7 +32,7 @@ import java.util.Set;
 public final class ModernWorkbench extends UiNode {
     private final ModuleCatalog catalog;
     private final WorkbenchState state;
-    private final ThemeTokens theme;
+    private volatile ThemeTokens theme;
     private boolean searchFocused;
 
     public ModernWorkbench(ModuleCatalog catalog, WorkbenchState state, ThemeTokens theme) {
@@ -38,6 +40,13 @@ public final class ModernWorkbench extends UiNode {
         this.state = state;
         this.theme = theme;
         setFocusable(true);
+    }
+
+    public ModernWorkbench(ModuleCatalog catalog, WorkbenchState state, ThemeRegistry themes) {
+        this(catalog, state, themes.getActive().getTokens());
+        themes.addListener(new ThemeRegistry.Listener() {
+            @Override public void onThemeChanged(ThemePack next) { ModernWorkbench.this.theme = next.getTokens(); }
+        });
     }
 
     @Override protected void render(UiCanvas canvas) {

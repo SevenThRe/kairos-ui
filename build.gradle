@@ -32,6 +32,13 @@ project(':ui-components') {
     }
 }
 
+project(':ui-esp') {
+    dependencies {
+        api project(':ui-api')
+        api project(':ui-core')
+    }
+}
+
 project(':platform-api') {
     dependencies { api project(':ui-api') }
 }
@@ -63,6 +70,7 @@ project(':platform-1.20.1-common') {
 project(':examples:modern-clickgui') {
     dependencies {
         implementation project(':ui-components')
+        implementation project(':ui-esp')
         implementation project(':platform-api')
         implementation project(':ui-preview-svg')
         implementation project(':ui-preview-awt')

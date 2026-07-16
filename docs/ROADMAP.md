@@ -32,10 +32,20 @@
 - Java 8/17 endpoint CI compilation
 - compatibility renderer and F6 dual-layout switch
 
-## M4 — production client integration
+## M4 — client visual systems (complete)
+
+- modern compact floating-panel theme and interactive inline settings
+- typed notification queue with enter/exit/progress lifecycle
+- content-sized, sorted ModuleList with name/suffix colors
+- hot-switchable theme registry, three built-ins and user theme persistence
+- shared ESP entity/projector/style renderer with matrix projection tests
+- Right Ctrl plus prefix-aware GUI and theme commands
+
+## M5 — consuming client integration
 
 - bind `UiModule`/`UiSetting` to the consuming client's real module/value registry
 - connect `CommandRenderer` to the consuming client's GL state and texture managers
 - package licensed Inter/JetBrains Mono/CJK fonts and icon assets
-- persist theme, panel and HUD layout through the consuming client's config service
+- persist panel and HUD layout through the consuming client's config service
+- implement each endpoint's live entity collector and camera-matrix provider for ESP
 - add 1.16.5/1.18.2 islands or Fabric endpoints when a distribution actually needs them

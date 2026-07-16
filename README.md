@@ -2,6 +2,12 @@
 
 Version-independent retained-mode UI foundations for a modern Minecraft client UI.
 
+Kairos ships a finished modern default rather than an unstyled widget kit: blue-black
+glass surfaces, violet controls, compact floating categories, a three-column workbench,
+animated toast notifications, a right-aligned ModuleList, draggable HUD widgets, and a
+theme-aware 2D ESP renderer. Client authors can replace every palette, font ID, radius,
+spacing, blur and motion token without forking a component.
+
 The engine supports both accepted Kairos compositions: a fixed three-column workspace
 with category navigation, module cards, and settings edited in context; and a floating
 category-panel desktop that keeps traditional ClickGUI muscle memory. They share the
@@ -25,6 +31,7 @@ same module model, visual primitives, typography, glass effects, and theme token
 | `ui-api` | Geometry, theme tokens, drawing and input contracts |
 | `ui-core` | Node tree, layout, focus, pointer capture and animation |
 | `ui-components` | Settings, workbench, draggable panel desktop and HUD scenes |
+| `ui-esp` | Entity snapshots, matrix projection, Full/Corner ESP, fill, health, names and distance |
 | `platform-api` | Screen, clock and render host boundary |
 | `ui-render-opengl` | Frame planning, shape batches, font atlas packing and GLSL 1.20 resources |
 | `ui-preview-awt` / `ui-preview-svg` | Deterministic headless visual preview backends |
@@ -35,15 +42,40 @@ same module model, visual primitives, typography, glass effects, and theme token
 
 The Minecraft build opens/closes with `Right Ctrl`; `F6` switches between the fixed
 workbench and floating panels. `.kairos gui`, `!kairos gui`, `/kairos gui`, and other
-punctuation prefixes are recognized by the standalone bridge. Consuming clients can
-call `KairosMod.openGui()` from their own prefix-aware command manager. It includes a
-compatibility canvas so both endpoints remain usable
-without shaders. The OpenGL pipeline is the production path for SDF corners, atlas
-text and shared blur; its final Minecraft GL-state binding remains isolated from UI code.
+punctuation prefixes are recognized by the standalone bridge. Theme commands are:
+
+```text
+.kairos themes
+.kairos theme arctic-glass
+.kairos themes reload
+```
+
+Custom theme files live in `.minecraft/kairos-ui/themes/*.properties`; the selected
+theme is persisted. Consuming clients can call `KairosMod.openGui()` or
+`KairosMod.handleCommand(message, prefix)` from an existing command manager.
+
+The endpoint compatibility canvas now preserves rounded geometry, tint, font scaling,
+scissor and interaction without shaders. The OpenGL pipeline remains the enhanced path
+for actual framebuffer blur, custom font atlases and batched SDF shapes.
+
+## Preview truth
+
+The PNG/SVG files are rendered by the same Java scene classes, models and `UiCanvas`
+operations used by the endpoints; they are not AI mockups. Layout, colors, content,
+sorting, clipping and render-command structure therefore reflect code that exists.
+AWT uses a deterministic block-world backdrop and a CPU blur approximation, while the
+current standalone Minecraft fallback uses the Minecraft font and a translucent rounded
+glass fallback. See [docs/PREVIEWS.md](docs/PREVIEWS.md) for the exact parity matrix.
+
+## Guides
+
+- [Theme packs and hot switching](docs/THEMING.md)
+- [ESP data, matrices and renderer integration](docs/ESP.md)
+- [Architecture and platform boundaries](docs/ARCHITECTURE.md)
 
 ## Verify without Gradle
 
-The repository has no external runtime dependencies in this milestone. On a JDK:
+The shared engine has no external runtime dependencies. On a JDK:
 
 ```bash
 ./scripts/verify.sh

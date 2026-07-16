@@ -6,7 +6,6 @@ import dev.kairos.ui.api.input.KeyAction;
 import dev.kairos.ui.api.input.PointerAction;
 import dev.kairos.ui.api.input.PointerEvent;
 import dev.kairos.ui.api.input.UiKeyEvent;
-import dev.kairos.ui.api.theme.ThemeTokens;
 import dev.kairos.ui.components.model.ModuleCatalog;
 import dev.kairos.ui.components.scene.ModernWorkbench;
 import dev.kairos.ui.components.scene.PanelDesktop;
@@ -51,8 +50,8 @@ public final class KairosScreen
         WorkbenchState state = new WorkbenchState();
         state.setSelectedCategoryId("combat");
         state.setSelectedModuleId("kill-aura");
-        workbench = new ModernWorkbench(catalog, state, ThemeTokens.kairosDark());
-        panels = new PanelDesktop(catalog, ThemeTokens.kairosDark());
+        workbench = new ModernWorkbench(catalog, state, KairosMod.getThemes());
+        panels = new PanelDesktop(catalog, KairosMod.getThemes());
         switchScene(false);
     }
 

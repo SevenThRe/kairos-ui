@@ -17,7 +17,21 @@ from its own command manager, or call `handleGuiCommand(message, prefix)` for ex
 prefix parsing. `setOpenKeyCode(...)` connects the activation key to the client's own
 keybind/config service, while Right Ctrl remains the default.
 
-The included `MinecraftFallbackCanvas` is the always-available compatibility path. It deliberately uses opaque/translucent native GUI primitives; production clients should replace it with the `ui-render-opengl` command pipeline to enable SDF corners, font atlases and the shared Kawase blur pass.
+Theme commands use the same prefix rule:
+
+```text
+.kairos themes
+.kairos theme obsidian-violet
+.kairos themes reload
+```
+
+Theme packs are read from `.minecraft/kairos-ui/themes/*.properties`. A consuming client
+can route its exact prefix to `KairosMod.handleCommand(message, prefix)`.
+
+The included `MinecraftFallbackCanvas` is the always-available compatibility path. It
+draws rounded/tinted geometry, scaled native text and nested scissors. Production clients
+can bind the `ui-render-opengl` command pipeline for custom font atlases, SDF batching and
+the shared Kawase framebuffer blur pass.
 
 Build from this directory with Gradle 9.2 running on JDK 21 and both JDK 8 and JDK 17
 available as compile toolchains:

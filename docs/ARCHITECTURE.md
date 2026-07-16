@@ -11,7 +11,9 @@ The engine exposes both accepted compositions over the same data model:
 
 `ModernWorkbench` implements that fixed layout. `PanelDesktop` provides draggable,
 collapsible, z-ordered category windows with inline module expansion, clipped scrolling,
-and pointer capture. HUD widgets reuse the same theme and can be moved independently.
+pointer capture, and interactive boolean/enum/number/range controls. HUD widgets reuse
+the same theme and can be moved independently. `ThemeRegistry` hot-switches all bound
+scenes and `ThemeDirectory` loads/persists user packs without Minecraft leaking inward.
 
 ## Boundary rule
 
@@ -42,6 +44,13 @@ Missing capabilities affect effects, never layout or interaction.
 Font loading belongs to the platform/render boundary. `FontAtlasBuilder` packs measured
 glyph bitmaps without a Minecraft dependency. Inter, JetBrains Mono and a CJK fallback
 remain theme font IDs so clients can supply licensed files or their own font provider.
+
+## ESP
+
+`ui-esp` consumes immutable entity snapshots and a `WorldToScreenProjector`. It projects
+all eight AABB corners before drawing a clipped 2D overlay. Minecraft endpoints own
+entity filtering, interpolation, camera-relative matrices and render-event timing; the
+style and drawing code remain shared.
 
 ## Settings
 

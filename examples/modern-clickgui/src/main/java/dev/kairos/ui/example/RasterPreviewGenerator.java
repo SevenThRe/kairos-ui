@@ -9,6 +9,7 @@ import dev.kairos.ui.components.scene.WorkbenchState;
 import dev.kairos.ui.preview.awt.AwtCanvas;
 import dev.kairos.ui.components.hud.HudModel;
 import dev.kairos.ui.components.hud.HudScene;
+import dev.kairos.ui.esp.EspOverlayScene;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -33,21 +34,30 @@ public final class RasterPreviewGenerator {
         workbenchCanvas.dispose();
 
         PanelDesktop panels = new PanelDesktop(catalog, theme);
-        panels.layout(new Rect(0f, 0f, 1280f, 720f));
+        panels.layout(new Rect(0f, 0f, 1600f, 900f));
         panels.getExpandedModules().add("kill-aura");
-        AwtCanvas panelCanvas = new AwtCanvas(1280, 720);
+        AwtCanvas panelCanvas = new AwtCanvas(1600, 900);
         panelCanvas.paintBackdrop();
         panels.renderTree(panelCanvas);
         ImageIO.write(panelCanvas.getImage(), "png", new File(output, "panel-desktop.png"));
         panelCanvas.dispose();
 
-        HudScene hud = new HudScene(new HudModel(), theme);
+        long previewNow = 100000L;
+        HudScene hud = new HudScene(new HudModel(previewNow), theme).setNowMillis(previewNow);
         hud.layout(new Rect(0f, 0f, 1280f, 720f));
         AwtCanvas hudCanvas = new AwtCanvas(1280, 720);
         hudCanvas.paintBackdrop();
         hud.renderTree(hudCanvas);
         ImageIO.write(hudCanvas.getImage(), "png", new File(output, "hud.png"));
         hudCanvas.dispose();
+
+        EspOverlayScene esp = DemoEsp.create(theme);
+        esp.layout(new Rect(0f, 0f, 1280f, 720f));
+        AwtCanvas espCanvas = new AwtCanvas(1280, 720);
+        espCanvas.paintBackdrop();
+        esp.renderTree(espCanvas);
+        ImageIO.write(espCanvas.getImage(), "png", new File(output, "esp.png"));
+        espCanvas.dispose();
         System.out.println("Raster previews: " + output.getAbsolutePath());
     }
 }

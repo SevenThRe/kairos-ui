@@ -15,6 +15,7 @@ sourceSets.main {
         engineRoot.resolve("ui-api/src/main/java"),
         engineRoot.resolve("ui-core/src/main/java"),
         engineRoot.resolve("ui-components/src/main/java"),
+        engineRoot.resolve("ui-esp/src/main/java"),
         engineRoot.resolve("platform-api/src/main/java"),
         engineRoot.resolve("ui-render-opengl/src/main/java"),
         engineRoot.resolve("platform-1.12.2-forge/src/main/java"),
