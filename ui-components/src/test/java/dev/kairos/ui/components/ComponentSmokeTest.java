@@ -31,6 +31,16 @@ public final class ComponentSmokeTest {
         scene.renderTree(canvas);
         require(canvas.getCommands().size() > 20, "workbench emitted render commands");
         require(canvas.getClipDepth() == 0, "clip stack balanced");
+        boolean wasEnabled = killAura.isEnabled();
+        require(scene.onPointer(new PointerEvent(300f, 160f, 0, 0f, PointerAction.DOWN))
+            == dev.kairos.ui.api.input.EventResult.HANDLED, "module row handles left click");
+        require(killAura.isEnabled() != wasEnabled, "left click toggles module without a pill control");
+        UiModule velocity = catalog.getModules().get(1);
+        boolean velocityEnabled = velocity.isEnabled();
+        require(scene.onPointer(new PointerEvent(300f, 220f, 1, 0f, PointerAction.DOWN))
+            == dev.kairos.ui.api.input.EventResult.HANDLED, "module row handles right click");
+        require("velocity".equals(state.getSelectedModuleId()), "right click selects module settings");
+        require(velocity.isEnabled() == velocityEnabled, "right click does not toggle module");
 
         PanelDesktop panels = new PanelDesktop(catalog, ThemeTokens.kairosDark());
         panels.layout(new Rect(0f, 0f, 1280f, 720f));

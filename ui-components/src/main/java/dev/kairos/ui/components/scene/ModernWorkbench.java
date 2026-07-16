@@ -93,12 +93,20 @@ public final class ModernWorkbench extends UiNode {
             int card = selected ? 0xEE252B36 : theme.surface;
             canvas.roundedRect(new Rect(modulesRect.getX() + 14f, moduleY, moduleWidth - 28f, 52f),
                 theme.componentRadius, card);
-            canvas.text(theme.fontMedium, module.getDisplayName(), modulesRect.getX() + 28f, moduleY + 21f,
-                12f, theme.textPrimary);
+            if (selected) {
+                canvas.roundedRect(new Rect(modulesRect.getX() + 14f, moduleY + 6f, 2f, 40f),
+                    1f, theme.accent);
+            }
+            if (module.isEnabled()) {
+                canvas.roundedRect(new Rect(modulesRect.getX() + 27f, moduleY + 17f, 5f, 5f),
+                    2.5f, 0xFF56B7D5);
+            }
+            canvas.text(theme.fontMedium, module.getDisplayName(), modulesRect.getX() + 38f, moduleY + 21f,
+                12f, module.isEnabled() ? 0xFF72C5DF : theme.textPrimary);
             canvas.text(theme.fontRegular, module.getDescription(), modulesRect.getX() + 28f, moduleY + 39f,
                 10f, theme.textSecondary);
-            canvas.roundedRect(new Rect(modulesRect.getRight() - 52f, moduleY + 17f, 28f, 16f), 8f,
-                module.isEnabled() ? theme.accent : 0xFF3B434B);
+            canvas.text(theme.fontMedium, "...", modulesRect.getRight() - 44f, moduleY + 20f,
+                10f, theme.textSecondary);
             moduleY += 60f;
         }
 
@@ -187,7 +195,8 @@ public final class ModernWorkbench extends UiNode {
     }
 
     @Override public EventResult onPointer(PointerEvent event) {
-        if (event.getAction() != PointerAction.DOWN || event.getButton() != 0) return EventResult.IGNORED;
+        if (event.getAction() != PointerAction.DOWN
+            || (event.getButton() != 0 && event.getButton() != 1)) return EventResult.IGNORED;
         Rect window = getBounds();
         float header = headerHeight();
         float sidebar = sidebarWidth();
@@ -195,10 +204,11 @@ public final class ModernWorkbench extends UiNode {
 
         Rect search = new Rect(window.getX() + sidebar + 18f, window.getY() + 8f,
             Math.min(280f, moduleColumn - 24f), header - 16f);
-        searchFocused = search.contains(event.getX(), event.getY());
+        searchFocused = event.getButton() == 0 && search.contains(event.getX(), event.getY());
         if (searchFocused) return EventResult.HANDLED;
 
-        if (event.getX() < window.getX() + sidebar && event.getY() >= window.getY() + header) {
+        if (event.getButton() == 0 && event.getX() < window.getX() + sidebar
+            && event.getY() >= window.getY() + header) {
             int index = (int) ((event.getY() - (window.getY() + header + 18f)) / 44f);
             if (index >= 0 && index < catalog.getCategories().size()) {
                 String category = catalog.getCategories().get(index).getId();
@@ -216,15 +226,15 @@ public final class ModernWorkbench extends UiNode {
             int index = (int) ((event.getY() - modulesY) / 60f);
             if (index >= 0 && index < modules.size()) {
                 UiModule module = modules.get(index);
-                float localX = event.getX() - modulesX;
-                if (localX >= moduleColumn - 66f) module.setEnabled(!module.isEnabled());
-                else {
-                    state.setSelectedModuleId(module.getId());
-                    state.setActiveGroup("General");
-                }
+                state.setSelectedModuleId(module.getId());
+                state.setActiveGroup("General");
+                // Myau-style semantics: left click toggles, right click only opens settings.
+                if (event.getButton() == 0) module.setEnabled(!module.isEnabled());
                 return EventResult.HANDLED;
             }
         }
+
+        if (event.getButton() != 0) return EventResult.IGNORED;
 
         UiModule module = selectedModule();
         float settingsX = modulesX + moduleColumn;
