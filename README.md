@@ -33,8 +33,11 @@ same module model, visual primitives, typography, glass effects, and theme token
 | `minecraft-build` | Real EGT multi-version Forge screen/bootstrap for 1.12.2 and 1.20.1 |
 | `examples/modern-clickgui` | Executable dual-layout and HUD reference scenes |
 
-The Minecraft build opens with `F8`; `F6` switches between the fixed workbench and
-floating panels. It includes a compatibility canvas so both endpoints remain usable
+The Minecraft build opens/closes with `Right Ctrl`; `F6` switches between the fixed
+workbench and floating panels. `.kairos gui`, `!kairos gui`, `/kairos gui`, and other
+punctuation prefixes are recognized by the standalone bridge. Consuming clients can
+call `KairosMod.openGui()` from their own prefix-aware command manager. It includes a
+compatibility canvas so both endpoints remain usable
 without shaders. The OpenGL pipeline is the production path for SDF corners, atlas
 text and shared blur; its final Minecraft GL-state binding remains isolated from UI code.
 

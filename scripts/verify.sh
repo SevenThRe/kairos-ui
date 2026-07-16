@@ -33,6 +33,7 @@ mapfile -t TEST_SOURCES < <(find \
   "$ROOT/ui-core/src/test/java" \
   "$ROOT/ui-components/src/test/java" \
   "$ROOT/ui-render-opengl/src/test/java" \
+  "$ROOT/platform-api/src/test/java" \
   "$ROOT/platform-1.12.2-forge/src/test/java" \
   "$ROOT/platform-1.20.1-common/src/test/java" \
   -name '*.java' -print | sort)
@@ -56,6 +57,7 @@ fi
 java -cp "$MAIN:$TEST" dev.kairos.ui.core.CoreSmokeTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.components.ComponentSmokeTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.render.opengl.RenderPipelineTest
+java -cp "$MAIN:$TEST" dev.kairos.ui.platform.KairosGuiActivationTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.legacy.Legacy112AdapterTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.modern.Modern120AdapterTest
 java -cp "$MAIN" dev.kairos.ui.example.WorkbenchExample

@@ -92,6 +92,7 @@ public final class KairosScreen
     //$$     return input.dispatch(modernInput.pointer(x, y, -1, -1, delta)) != EventResult.IGNORED;
     //$$ }
     //$$ @Override public boolean keyPressed(int key, int scanCode, int modifiers) {
+    //$$     if (key == KairosMod.getOpenKeyCode()) { onClose(); return true; }
     //$$     if (key == 295) { switchScene(!panelMode); return true; }
     //$$     EventResult result = input.dispatch(modernInput.key(key, scanCode, 1, modifiers));
     //$$     if (result != EventResult.IGNORED) return true;
@@ -129,6 +130,10 @@ public final class KairosScreen
         }
     }
     @Override protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (keyCode == KairosMod.getOpenKeyCode()) {
+            Minecraft.getMinecraft().displayGuiScreen(null);
+            return;
+        }
         if (keyCode == 64) { switchScene(!panelMode); return; }
         EventResult result = input.dispatch(new UiKeyEvent(keyCode, keyCode, 0, typedChar, KeyAction.DOWN));
         if (result == EventResult.IGNORED) super.keyTyped(typedChar, keyCode);
