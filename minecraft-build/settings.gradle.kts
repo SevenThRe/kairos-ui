@@ -17,6 +17,9 @@ pluginManagement {
 
 rootProject.name = "kairos-ui-minecraft"
 
+include(":engine")
+project(":engine").projectDir = file("engine")
+
 listOf("1.12.2-forge", "1.20.1-forge").forEach { target ->
     include(":$target")
     project(":$target").apply {
