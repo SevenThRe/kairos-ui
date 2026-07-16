@@ -157,7 +157,9 @@ shadowJar {
         exclude 'net/montoyo/mcef/coremod/**'
         exclude 'assets/mcef/letsencryptauthorityx3.crt'
     }
-    from(mcefCoremodJar.archivePath) {
+    // Resolve the nested JAR lazily. With Gradle 4, eagerly reading archivePath
+    // before mcefCoremodJar executes causes Shadow to silently omit the file.
+    from({ mcefCoremodJar.archivePath }) {
         into ''
     }
     from('../LICENSE') {
