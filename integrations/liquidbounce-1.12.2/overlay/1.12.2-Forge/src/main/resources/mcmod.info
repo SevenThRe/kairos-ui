@@ -1,0 +1,33 @@
+[
+  {
+    "modid": "liquidbounce",
+    "name": "LiquidBounce + Kairos",
+    "description": "LiquidBounce b73 1.12.2 with the Kairos Web ClickGUI.",
+    "version": "${version}",
+    "mcversion": "1.12.2",
+    "url": "https://github.com/SevenThRe/kairos-ui",
+    "authorList": ["CCBlueX", "Kamiya1337", "SevenThRe"],
+    "credits": "LiquidBounce GPL-3.0; Kairos integration; MCEF by montoyo.",
+    "dependencies": []
+  },
+  {
+    "modid": "kairos_ui",
+    "name": "Kairos UI",
+    "description": "Modern browser-rendered ClickGUI for the live LiquidBounce module system.",
+    "version": "1.12.2-b73-kairos-r1",
+    "mcversion": "1.12.2",
+    "url": "https://github.com/SevenThRe/kairos-ui",
+    "authorList": ["SevenThRe"],
+    "dependencies": []
+  },
+  {
+    "modid": "mcef",
+    "name": "Minecraft Chromium Embedded Framework",
+    "description": "Embedded web runtime used by Kairos UI.",
+    "version": "1.11",
+    "mcversion": "1.12.2",
+    "url": "https://github.com/montoyo/mcef",
+    "authorList": ["montoyo"],
+    "dependencies": []
+  }
+]

@@ -1,0 +1,13 @@
+diff --git a/shared/main/java/net/ccbluex/liquidbounce/features/command/CommandManager.kt b/shared/main/java/net/ccbluex/liquidbounce/features/command/CommandManager.kt
+index 298f3bd..0f48e79 100644
+--- a/shared/main/java/net/ccbluex/liquidbounce/features/command/CommandManager.kt
++++ b/shared/main/java/net/ccbluex/liquidbounce/features/command/CommandManager.kt
+@@ -48,6 +48,7 @@ class CommandManager {
+         registerCommand(PrefixCommand())
+         registerCommand(ShortcutCommand())
+         registerCommand(HideCommand())
++        registerCommand(KairosCommand())
+     }
+ 
+     /**
+

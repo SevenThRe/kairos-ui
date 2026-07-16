@@ -1,6 +1,6 @@
 # Kairos UI Engine
 
-Version-independent client UI foundations with a WebView ClickGUI and native HUD/ESP runtime.
+Version-independent UI foundations plus a real LiquidBounce Forge 1.12.2 Web ClickGUI integration.
 
 Kairos ships a finished modern default rather than an unstyled widget kit: an offline
 HTML/CSS ClickGUI rendered by Chromium, blue-black glass surfaces, violet controls,
@@ -8,10 +8,11 @@ animated notifications, a right-aligned ModuleList, HUD widgets, combat HUD prim
 and entity/world-object ESP foundations. Client authors can override the entire ClickGUI
 palette and typography with CSS and configure HUD/ESP styles without forking the runtime.
 
-The production Forge 1.12.2 endpoint uses one WebView composition: category navigation,
-a compact module list, and an in-context settings inspector. The earlier native
-`MinecraftFallbackCanvas` path has been deleted and cannot reappear when WebView setup
-fails. Native HUD and ESP rendering remain separate because they execute every game frame.
+The production Forge 1.12.2 artifact now uses the GPL LiquidBounce b73 1.12.2 port as
+its client runtime. Kairos is connected directly to its real `ModuleManager`, module
+states and `Value` objects. The earlier standalone demo module catalog and native
+ClickGUI have been removed from the deliverable. MCEF and its shutdown coremod are
+embedded in the same Forge JAR, so there is no separate `mcef` mod dependency.
 
 ## Design constraints
 
@@ -37,33 +38,21 @@ fails. Native HUD and ESP rendering remain separate because they execute every g
 | `ui-preview-awt` / `ui-preview-svg` | Deterministic headless visual preview backends |
 | `platform-1.12.2-forge` | Tested LWJGL2 coordinate, key and scissor conversion |
 | `platform-1.20.1-common` | Tested GLFW coordinate, key and scissor conversion |
-| `minecraft-build` | EGT Forge endpoints, MCEF WebView host, secure JS bridge and bundled Web UI |
+| `integrations/liquidbounce-1.12.2` | Pinned GPL source overlay, MCEF host, live module/value bridge and reproducible single-JAR build |
 | `examples/modern-clickgui` | Headless model/HUD reference scenes retained for engine tests |
 
-The Minecraft build opens/closes with `Right Ctrl`. `.kairos gui`, `!kairos gui`, `/kairos gui`, and other
-punctuation prefixes are recognized by the standalone bridge. Theme commands are:
+The integrated client opens/closes with `Right Ctrl`. Its command is `kairos gui` under
+LiquidBounce's currently configured prefix, so the default is:
 
 ```text
-.kairos themes
-.kairos theme arctic-glass
-.kairos themes reload
+.kairos gui
 ```
 
-Custom theme files live in `.minecraft/kairos-ui/themes/*.properties`; the selected
-theme is persisted. Consuming clients can call `KairosMod.openGui()` or
-`KairosMod.handleCommand(message, prefix)` from an existing command manager.
-
-The Forge 1.12.2 `0.4.0` endpoint uses a persistent live module manager.
-Sprint, AutoJump, AutoRespawn, FastPlace, FullBright, PlayerESP, HUD, ModuleList,
-Coordinates, and Notifications are connected to Forge tick/render events and toggled by
-the same module objects displayed by Kairos. This is a clean-room Forge implementation;
-no LiquidBounce GPL source is copied into the repository.
-
-The ClickGUI requires the separate MCEF `1.12.2-1.11` Forge mod. Bundled assets are
-served only from `kairos://ui/`; bridge calls are origin checked and scheduled back onto
-Minecraft's client thread. Missing/virtual MCEF produces an explicit chat error—there is
-no native fallback. Copy `minecraft-build/web-theme.example.css` to
-`.minecraft/kairos-ui/web-theme.css` to override the Web UI theme.
+Changing the LiquidBounce prefix automatically changes the Kairos command prefix. Theme,
+blur and animation values are persisted through LiquidBounce's normal value config.
+The complete palette and component appearance can be overridden with
+`.minecraft/kairos-ui/custom.css`. Bundled assets are served from `kairos://ui/`;
+bridge calls are origin checked and scheduled onto Minecraft's client thread.
 
 ## Preview truth
 
@@ -91,14 +80,15 @@ The script compiles with `--release 8`, runs engine, component, renderer and end
 mapping tests, checks both preprocessor branches, scans shared sources for forbidden
 platform imports, and emits PNG/SVG previews under `out/verify/previews`.
 
-## Minecraft endpoint build
+## LiquidBounce 1.12.2 build
 
-`minecraft-build` is independent so Forge mappings and downloads cannot destabilize
-the Java-8 engine build. With Gradle 9.2 running on JDK 21 plus JDK 8 and JDK 17
-available as compile toolchains:
+The integration is reproducible from a pinned upstream commit and MCEF release. See
+[`integrations/liquidbounce-1.12.2/README.md`](integrations/liquidbounce-1.12.2/README.md)
+for local steps. GitHub Actions builds and inspects the combined artifact for real
+LiquidBounce modules, Kairos classes/assets, MCEF/JCEF classes and the nested MCEF
+shutdown coremod.
 
 ```bash
-gradle -p minecraft-build :1.12.2-forge:build :1.20.1-forge:build
+./integrations/liquidbounce-1.12.2/prepare.sh /path/to/liquidbounce /path/to/mcef-api.jar
+JAVA_HOME=/path/to/jdk8 /path/to/liquidbounce/gradlew -p /path/to/liquidbounce :1.12.2-Forge:build
 ```
-
-GitHub Actions performs endpoint compilation in addition to the dependency-free engine verification.

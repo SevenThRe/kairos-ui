@@ -1,0 +1,37 @@
+:root {
+  --accent: #8b5cf6;
+  --accent-bright: #b29aff;
+  --accent-soft: rgba(139, 92, 246, .17);
+  --accent-line: rgba(178, 154, 255, .42);
+  --success: #55e6a5;
+  --danger: #ff7185;
+  --window: rgba(9, 14, 21, .84);
+  --topbar: rgba(18, 25, 35, .72);
+  --panel: rgba(15, 22, 31, .72);
+  --panel-strong: rgba(20, 28, 39, .94);
+  --component: rgba(255, 255, 255, .042);
+  --component-hover: rgba(255, 255, 255, .072);
+  --line: rgba(255, 255, 255, .072);
+  --line-strong: rgba(255, 255, 255, .12);
+  --text: #f5f7fb;
+  --muted: #98a3b2;
+  --subtle: #697482;
+  --font-ui: Inter, "Segoe UI Variable", "Segoe UI", "SF Pro Display", Roboto, Arial, sans-serif;
+  --window-radius: 18px;
+  --component-radius: 10px;
+}
+
+html[data-theme="cyan"] {
+  --accent: #18afd0;
+  --accent-bright: #68e7f4;
+  --accent-soft: rgba(24, 175, 208, .16);
+  --accent-line: rgba(104, 231, 244, .42);
+}
+
+html[data-theme="rose"] {
+  --accent: #e85d89;
+  --accent-bright: #f7a3c4;
+  --accent-soft: rgba(232, 93, 137, .16);
+  --accent-line: rgba(247, 163, 196, .42);
+}
+

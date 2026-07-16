@@ -2,11 +2,10 @@
 
 ## Web ClickGUI
 
-The production ClickGUI uses CSS variables. Copy `minecraft-build/web-theme.example.css`
-to `.minecraft/kairos-ui/web-theme.css`; the private resource scheme loads it after the
-bundled defaults. Accent, typeface, radii, surfaces and text colors can therefore change
-without recompiling Java. The theme button also cycles the bundled violet, cyan and rose
-variants and stores the selection in the local MCEF profile.
+The production ClickGUI uses CSS variables. Create `.minecraft/kairos-ui/custom.css`;
+the private resource scheme loads it after the bundled defaults. Accent, typeface, radii,
+surfaces and text colors can therefore change without recompiling Java. The theme button
+cycles violet, cyan and rose variants through LiquidBounce's persisted `Theme` value.
 
 The properties system below remains the native HUD/ESP theme API.
 
@@ -23,14 +22,8 @@ the module catalog, setting values, panel positions, or HUD data.
 
 ## In game
 
-```text
-.kairos themes
-.kairos theme arctic-glass
-.kairos themes reload
-```
-
-Any punctuation prefix works in the standalone endpoint. Integrations with a customer
-prefix call `KairosMod.handleCommand(rawMessage, customerPrefix)`.
+Open the menu with `.kairos gui`. The leading character is LiquidBounce's configurable
+command prefix, so it changes automatically with the client's prefix command.
 
 Custom files are loaded from `.minecraft/kairos-ui/themes/*.properties`. Copy
 `examples/themes/kairos-modern.properties`, change its `id`, and edit ARGB colors in

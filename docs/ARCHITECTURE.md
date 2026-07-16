@@ -20,8 +20,8 @@ The deleted Minecraft canvas is not a fallback path; WebView failure is reported
 Dependencies point inward: Minecraft/loader → platform adapter → `platform-api` →
 `ui-components` → `ui-core` → `ui-api`.
 
-Core code cannot import Minecraft or a loader. The MCEF host stays in `minecraft-build`.
-A CI source scan enforces the initial
+Core code cannot import Minecraft or a loader. The concrete MCEF/LiquidBounce host stays
+in `integrations/liquidbounce-1.12.2`. A CI source scan enforces the initial
 rule; later it should be replaced with an ArchUnit test.
 
 ## Rendering
@@ -64,7 +64,6 @@ creates another settings window.
 ## Version strategy
 
 The shared engine is Java 8 bytecode. Endpoint-specific event, key, coordinate and
-scissor handling lives in thin modules. `minecraft-build` uses Essential Gradle Toolkit
-preprocessing for one screen/bootstrap source tree and currently compiles Forge 1.12.2
-and Forge 1.20.1 endpoints. Intermediate versions are added as graph nodes/platform
-islands; they do not fork the UI implementation.
+scissor handling lives in thin modules. The production 1.12.2 island is the pinned GPL
+LiquidBounce integration. Later Forge/Fabric islands can reuse the UI protocol and Web
+assets without presenting the old standalone demo client as a production endpoint.

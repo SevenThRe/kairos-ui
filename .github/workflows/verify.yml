@@ -19,39 +19,40 @@ jobs:
           name: kairos-ui-previews
           path: out/verify/previews
 
-  minecraft-endpoints:
+  liquidbounce-1-12-2:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - name: Install Java 8 toolchain
+      - name: Install Java 8
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '8'
-      - name: Remember Java 8
-        run: echo "JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-      - name: Install Java 17 runtime
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - name: Remember Java 17
-        run: echo "JAVA17_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
-      - name: Install Java 21 Gradle runtime
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.2.0'
-      - name: Build Forge endpoint artifacts
+      - name: Check out pinned LiquidBounce 1.12.2 source
+        run: |
+          git clone https://github.com/Kamiya1337/LiquidBounce-1.12.2.git liquidbounce
+          git -C liquidbounce checkout 23e11be9b078a931edc68078f4be62a1c48724a5
+      - name: Download pinned MCEF runtime
         run: >-
-          gradle -p minecraft-build
-          -Dorg.gradle.java.installations.paths="$JAVA8_HOME,$JAVA17_HOME,$JAVA_HOME"
-          :1.12.2-forge:build :1.20.1-forge:build
+          curl -fL
+          https://github.com/montoyo/mcef/releases/download/1.12.2-1.11/mcef-1.12.2-1.11-api.jar
+          -o mcef-1.12.2-1.11-api.jar
+      - name: Apply Kairos integration overlay
+        run: |
+          chmod +x integrations/liquidbounce-1.12.2/prepare.sh liquidbounce/gradlew
+          ./integrations/liquidbounce-1.12.2/prepare.sh "$PWD/liquidbounce" "$PWD/mcef-1.12.2-1.11-api.jar"
+      - name: Build combined Forge client
+        working-directory: liquidbounce
+        run: ./gradlew --no-daemon :1.12.2-Forge:build
+      - name: Verify combined JAR
+        run: |
+          chmod +x scripts/verify-liquidbounce-jar.sh
+          ./scripts/verify-liquidbounce-jar.sh liquidbounce/1.12.2-Forge/build/libs/Kairos-LiquidBounce-1.12.2-b73-kairos-r1.jar
+          mkdir -p dist
+          cp liquidbounce/1.12.2-Forge/build/libs/Kairos-LiquidBounce-1.12.2-b73-kairos-r1.jar dist/
       - uses: actions/upload-artifact@v4
         with:
-          name: kairos-ui-forge-endpoints
-          path: minecraft-build/versions/*/build/libs/*.jar
+          name: Kairos-LiquidBounce-1.12.2-b73-kairos-r1
+          path: dist/Kairos-LiquidBounce-1.12.2-b73-kairos-r1.jar
+          if-no-files-found: error
