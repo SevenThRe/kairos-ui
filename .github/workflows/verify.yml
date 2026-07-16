@@ -46,8 +46,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.2.0'
-      - name: Compile Forge endpoint adapters
+      - name: Build Forge endpoint artifacts
         run: >-
           gradle -p minecraft-build
           -Dorg.gradle.java.installations.paths="$JAVA8_HOME,$JAVA17_HOME,$JAVA_HOME"
-          :1.12.2-forge:compileJava :1.20.1-forge:compileJava
+          :1.12.2-forge:build :1.20.1-forge:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kairos-ui-forge-endpoints
+          path: minecraft-build/versions/*/build/libs/*.jar
