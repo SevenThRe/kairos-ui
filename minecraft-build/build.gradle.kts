@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":engine"))
 }
 
+evaluationDependsOn(":engine")
 val engineOutput = project(":engine").extensions.getByType<SourceSetContainer>()
     .named("main").map { it.output }
 
