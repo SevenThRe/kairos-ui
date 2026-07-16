@@ -1,0 +1,40 @@
+diff --git a/shared/main/java/net/ccbluex/liquidbounce/ui/client/altmanager/sub/altgenerator/GuiTheAltening.kt b/shared/main/java/net/ccbluex/liquidbounce/ui/client/altmanager/sub/altgenerator/GuiTheAltening.kt
+--- a/shared/main/java/net/ccbluex/liquidbounce/ui/client/altmanager/sub/altgenerator/GuiTheAltening.kt
++++ b/shared/main/java/net/ccbluex/liquidbounce/ui/client/altmanager/sub/altgenerator/GuiTheAltening.kt
+@@ -110,11 +110,10 @@ class GuiTheAltening(private val prevGui: GuiAltManager) : WrappedGuiScreen() {
+                 generateButton.enabled = false
+                 apiKey = apiKeyField.text
+ 
+-                val altening = TheAltening(apiKey)
+-                val asynchronous = TheAltening.Asynchronous(altening)
++                val asynchronous = TheAltening.newAsyncRetriever(apiKey)
+                 status = "§cGenerating account..."
+ 
+-                asynchronous.accountData.thenAccept { account ->
++                asynchronous.getAccountDataAsync().thenAccept { account ->
+                     status = "§aGenerated account: §b§l${account.username}"
+ 
+                     try {
+diff --git a/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/gui/MixinGuiDisconnected.java b/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/gui/MixinGuiDisconnected.java
+--- a/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/gui/MixinGuiDisconnected.java
++++ b/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/gui/MixinGuiDisconnected.java
+@@ -10,6 +10,6 @@ import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
+ import com.thealtening.AltService;
+ import com.thealtening.api.TheAltening;
+-import com.thealtening.api.data.AccountData;
++import com.thealtening.api.response.Account;
+ import net.ccbluex.liquidbounce.LiquidBounce;
+ import net.ccbluex.liquidbounce.event.SessionEvent;
+ import net.ccbluex.liquidbounce.features.special.AntiForge;
+@@ -72,10 +72,9 @@ public abstract class MixinGuiDisconnected extends MixinGuiScreen {
+             case 3:
+                 if (!GuiTheAltening.Companion.getApiKey().isEmpty()) {
+                     final String apiKey = GuiTheAltening.Companion.getApiKey();
+-                    final TheAltening theAltening = new TheAltening(apiKey);
+ 
+                     try {
+-                        final AccountData account = theAltening.getAccountData();
++                        final Account account = TheAltening.newBasicRetriever(apiKey).getAccount();
+                         GuiAltManager.altService.switchService(AltService.EnumAltService.THEALTENING);
+ 
+                         final YggdrasilUserAuthentication yggdrasilUserAuthentication = new YggdrasilUserAuthentication(new YggdrasilAuthenticationService(Proxy.NO_PROXY, ""), Agent.MINECRAFT);
