@@ -157,11 +157,6 @@ shadowJar {
         exclude 'net/montoyo/mcef/coremod/**'
         exclude 'assets/mcef/letsencryptauthorityx3.crt'
     }
-    // Resolve the nested JAR lazily. With Gradle 4, eagerly reading archivePath
-    // before mcefCoremodJar executes causes Shadow to silently omit the file.
-    from({ mcefCoremodJar.archivePath }) {
-        into ''
-    }
     from('../LICENSE') {
         into 'META-INF'
         rename { 'LICENSE-LiquidBounce-GPL-3.0.txt' }
@@ -179,9 +174,26 @@ shadowJar {
 reobf { shadowJar { mappingType = 'SEARGE' } }
 tasks.reobfShadowJar.mustRunAfter shadowJar
 
+// Shadow 4.0.4 silently drops a nested JAR added through its CopySpec. Add the
+// Forge ContainedDeps coremod only after the final shadow artifact is reobfed.
+task embedMcefCoremod {
+    dependsOn reobfShadowJar
+    inputs.file mcefCoremodJar.archivePath
+    outputs.file shadowJar.archivePath
+    outputs.upToDateWhen { false }
+
+    doLast {
+        ant.zip(destfile: shadowJar.archivePath, update: true) {
+            fileset(dir: mcefCoremodJar.destinationDir) {
+                include(name: mcefCoremodJar.archiveName)
+            }
+        }
+    }
+}
+
 configurations {
     external
     compile.extendsFrom external
 }
 
-build.dependsOn reobfShadowJar
+build.dependsOn embedMcefCoremod
