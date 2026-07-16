@@ -48,8 +48,8 @@ public final class KairosScreen
         //#endif
         ModuleCatalog catalog = KairosCatalog.create();
         WorkbenchState state = new WorkbenchState();
-        state.setSelectedCategoryId("combat");
-        state.setSelectedModuleId("kill-aura");
+        state.setSelectedCategoryId("movement");
+        state.setSelectedModuleId("sprint");
         workbench = new ModernWorkbench(catalog, state, KairosMod.getThemes());
         panels = new PanelDesktop(catalog, KairosMod.getThemes());
         switchScene(false);

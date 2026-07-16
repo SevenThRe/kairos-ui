@@ -55,6 +55,12 @@ Custom theme files live in `.minecraft/kairos-ui/themes/*.properties`; the selec
 theme is persisted. Consuming clients can call `KairosMod.openGui()` or
 `KairosMod.handleCommand(message, prefix)` from an existing command manager.
 
+The Forge 1.12.2 `0.3.0` playable preview now uses a persistent live module manager.
+Sprint, AutoJump, AutoRespawn, FastPlace, FullBright, PlayerESP, HUD, ModuleList,
+Coordinates, and Notifications are connected to Forge tick/render events and toggled by
+the same module objects displayed by Kairos. This is a clean-room Forge implementation;
+no LiquidBounce GPL source is copied into the repository.
+
 The endpoint compatibility canvas now preserves rounded geometry, tint, font scaling,
 scissor and interaction without shaders. The OpenGL pipeline remains the enhanced path
 for actual framebuffer blur, custom font atlases and batched SDF shapes.

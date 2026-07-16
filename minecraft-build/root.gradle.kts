@@ -4,7 +4,7 @@ plugins {
 }
 
 base.archivesName = "kairos-ui"
-version = "0.2.0"
+version = "0.3.0"
 
 preprocess {
     val forge12001 = createNode("1.20.1-forge", 12001, "srg")

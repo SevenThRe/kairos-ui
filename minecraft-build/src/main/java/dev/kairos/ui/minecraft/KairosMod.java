@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatEvent;
+//#if MC<11600
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+//#endif
 import net.minecraftforge.common.MinecraftForge;
 //#if MC>=11600
 //$$ import net.minecraftforge.event.TickEvent;
@@ -30,12 +34,13 @@ import net.minecraft.util.text.TextComponentString;
 //#if MC>=11600
 //$$ @Mod(KairosMod.MOD_ID)
 //#else
-@Mod(modid = KairosMod.MOD_ID, name = "Kairos UI", version = "0.2.0", clientSideOnly = true)
+@Mod(modid = KairosMod.MOD_ID, name = "Kairos Client", version = "0.3.0", clientSideOnly = true)
 //#endif
 public final class KairosMod {
     public static final String MOD_ID = "kairos_ui";
     private static final ThemeRegistry THEMES = ThemeRegistry.kairosDefaults();
     private static ThemeDirectory themeDirectory;
+    private static KairosModuleManager moduleManager;
     private static int openKeyCode =
         //#if MC>=11600
         //$$ KairosGuiActivation.GLFW_RIGHT_CONTROL;
@@ -46,7 +51,9 @@ public final class KairosMod {
 
     public KairosMod() {
         // Launchers set user.dir to the active game directory on both supported endpoints.
-        themeDirectory = new ThemeDirectory(new File(System.getProperty("user.dir"), "kairos-ui"));
+        File dataDirectory = new File(System.getProperty("user.dir"), "kairos-ui");
+        themeDirectory = new ThemeDirectory(dataDirectory);
+        moduleManager = new KairosModuleManager(dataDirectory);
         try { themeDirectory.loadInto(THEMES); }
         catch (IOException exception) { System.err.println("Kairos theme load failed: " + exception.getMessage()); }
         //#if MC>=11600
@@ -74,12 +81,37 @@ public final class KairosMod {
             && (minecraft.currentScreen == null || minecraft.currentScreen instanceof KairosScreen)) toggleGui();
         //#endif
         openKeyWasDown = keyDown;
+        moduleManager.tick();
     }
+
+    //#if MC<11600
+    @SubscribeEvent
+    public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
+        if (event.getType() == RenderGameOverlayEvent.ElementType.ALL) moduleManager.renderOverlay();
+    }
+
+    @SubscribeEvent
+    public void onRenderWorld(RenderWorldLastEvent event) {
+        moduleManager.renderWorld(event.getPartialTicks());
+    }
+    //#endif
 
     //#if MC<11600
     @SubscribeEvent
     //#endif
     public void onClientChat(ClientChatEvent event) {
+        String raw = event.getMessage() == null ? "" : event.getMessage().trim();
+        if (raw.matches("^[^A-Za-z0-9]kairos\\s+modules$")) {
+            event.setCanceled(true);
+            systemMessage("Kairos modules: " + moduleManager.listModules());
+            return;
+        }
+        if (raw.matches("^[^A-Za-z0-9]kairos\\s+toggle\\s+[A-Za-z0-9._-]+$")) {
+            event.setCanceled(true);
+            String id = raw.substring(raw.lastIndexOf(' ') + 1);
+            systemMessage(moduleManager.toggle(id) ? "Toggled " + id : "Unknown module: " + id);
+            return;
+        }
         KairosClientCommand command = KairosClientCommand.parseAnyPunctuationPrefix(event.getMessage());
         if (command == null) return;
         event.setCanceled(true);
@@ -88,6 +120,12 @@ public final class KairosMod {
 
     public static int getOpenKeyCode() { return openKeyCode; }
     public static ThemeRegistry getThemes() { return THEMES; }
+    static KairosModuleManager getModuleManager() {
+        if (moduleManager == null) {
+            moduleManager = new KairosModuleManager(new File(System.getProperty("user.dir"), "kairos-ui"));
+        }
+        return moduleManager;
+    }
 
     /** Allows a consuming client config/keybind service to replace the Right Ctrl default. */
     public static void setOpenKeyCode(int keyCode) {

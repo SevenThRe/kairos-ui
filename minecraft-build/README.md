@@ -9,6 +9,22 @@ The standard `engine` subproject compiles all Minecraft-independent code once as
 each endpoint depends on and embeds that output, so the preprocessor only touches the
 small loader/screen bridge.
 
+## Playable 1.12.2 preview
+
+The 0.3.0 Forge 1.12.2 artifact contains a real module runtime rather than the old static
+demo catalog. These modules are currently implemented and visible in the ClickGUI:
+
+- Movement: Sprint, AutoJump
+- Player: AutoRespawn, FastPlace
+- Render: FullBright, PlayerESP, HUD, ModuleList, Coordinates
+- Misc: Notifications
+
+Clicking a module in either Kairos layout changes the live runtime state. State is stored
+in `.minecraft/kairos-ui/modules.properties`. Forge client ticks execute movement/player
+modules, `RenderGameOverlayEvent` draws HUD widgets, and `RenderWorldLastEvent` draws
+PlayerESP. The 1.20.1 endpoint still compiles as an engine integration target, but this
+specific functional preview is intentionally 1.12.2-first.
+
 Press `Right Ctrl` in game to open or close Kairos. Press `F6` inside the screen to
 switch between the fixed workbench and draggable panel desktop. The standalone bridge
 also recognizes `<punctuation-prefix>kairos gui`, for example `.kairos gui`,
@@ -23,6 +39,14 @@ Theme commands use the same prefix rule:
 .kairos themes
 .kairos theme obsidian-violet
 .kairos themes reload
+```
+
+Runtime module commands also accept any single punctuation prefix:
+
+```text
+.kairos modules
+.kairos toggle sprint
+.kairos toggle player-esp
 ```
 
 Theme packs are read from `.minecraft/kairos-ui/themes/*.properties`. A consuming client
