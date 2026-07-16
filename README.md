@@ -64,8 +64,8 @@ for actual framebuffer blur, custom font atlases and batched SDF shapes.
 The PNG/SVG files are rendered by the same Java scene classes, models and `UiCanvas`
 operations used by the endpoints; they are not AI mockups. Layout, colors, content,
 sorting, clipping and render-command structure therefore reflect code that exists.
-AWT uses a deterministic block-world backdrop, a CPU blur approximation, and semantic
-entity/item fixtures. Native entity and ItemStack pixels require the endpoint to bind
+AWT uses a deterministic block-world backdrop and a CPU blur approximation. Entity and
+item slots are intentionally blank: native pixels require the endpoint to bind
 `GameVisualRenderer`; the layout and all surrounding pixels are already the production
 scene. See [docs/PREVIEWS.md](docs/PREVIEWS.md) for the exact parity matrix.
 

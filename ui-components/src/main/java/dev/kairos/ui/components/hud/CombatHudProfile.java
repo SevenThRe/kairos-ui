@@ -28,8 +28,8 @@ public final class CombatHudProfile {
     }
 
     public static CombatHudProfile competitivePixel() {
-        return new CombatHudProfile("jetbrains-mono", 0xD5141518, 0xE8E9EDF2,
-            0xFFF4F4F4, 0xFFC1C5CA, 0xFFFF535A, 0xFF56E18A, 0xFF52E57D,
+        return new CombatHudProfile("jetbrains-mono", 0xE2111419, 0xC93A414B,
+            0xFFF2F4F7, 0xFF9DA5AE, 0xFFFF5964, 0xFF54E393, 0xFF52E57D,
             0xFFFFC447, true);
     }
 }

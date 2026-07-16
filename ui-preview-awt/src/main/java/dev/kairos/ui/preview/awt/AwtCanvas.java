@@ -110,56 +110,7 @@ public final class AwtCanvas implements UiCanvas {
     }
 
     @Override public void image(String textureId, Rect rect, int tintArgb) {
-        if (textureId != null && textureId.startsWith("entity:")) {
-            drawEntityPreview(rect, tintArgb);
-            return;
-        }
-        if (textureId != null && textureId.startsWith("item:")) {
-            drawItemPreview(textureId.substring(5), rect, tintArgb);
-            return;
-        }
         roundedRect(rect, Math.min(rect.getWidth(), rect.getHeight()) * 0.18f, tintArgb);
-    }
-
-    private void drawEntityPreview(Rect r, int tintArgb) {
-        float unit = Math.max(2f, Math.min(r.getWidth() / 8f, r.getHeight() / 12f));
-        float cx = r.getX() + r.getWidth() * .5f;
-        int skin = multiply(0xFFB98262, tintArgb);
-        int cloth = multiply(0xFFB82F36, tintArgb);
-        int dark = multiply(0xFF252A31, tintArgb);
-        fillRect(new Rect(cx - unit * 2f, r.getY() + unit, unit * 4f, unit * 3.4f), skin);
-        fillRect(new Rect(cx - unit * 2.4f, r.getY() + unit * 4.5f, unit * 4.8f, unit * 4.1f), cloth);
-        fillRect(new Rect(cx - unit * 3.5f, r.getY() + unit * 4.8f, unit, unit * 4.2f), skin);
-        fillRect(new Rect(cx + unit * 2.5f, r.getY() + unit * 4.8f, unit, unit * 4.2f), skin);
-        fillRect(new Rect(cx - unit * 2.2f, r.getY() + unit * 8.5f, unit * 1.8f, unit * 3.2f), dark);
-        fillRect(new Rect(cx + unit * .4f, r.getY() + unit * 8.5f, unit * 1.8f, unit * 3.2f), dark);
-        fillRect(new Rect(cx - unit * 1.25f, r.getY() + unit * 2.2f, unit * .55f, unit * .4f), 0xFF20242A);
-        fillRect(new Rect(cx + unit * .7f, r.getY() + unit * 2.2f, unit * .55f, unit * .4f), 0xFF20242A);
-    }
-
-    private void drawItemPreview(String id, Rect r, int tintArgb) {
-        float s = Math.min(r.getWidth(), r.getHeight());
-        float x = r.getX() + (r.getWidth() - s) * .5f;
-        float y = r.getY() + (r.getHeight() - s) * .5f;
-        if (id.contains("sword")) {
-            graphics.setStroke(new BasicStroke(Math.max(2f, s * .11f)));
-            graphics.setColor(new Color(multiply(0xFFDCE7F1, tintArgb), true));
-            graphics.drawLine(i(x + s * .72f), i(y + s * .18f), i(x + s * .30f), i(y + s * .70f));
-            graphics.setColor(new Color(0xFF7E4B28, true));
-            graphics.drawLine(i(x + s * .25f), i(y + s * .75f), i(x + s * .15f), i(y + s * .88f));
-            graphics.drawLine(i(x + s * .20f), i(y + s * .63f), i(x + s * .38f), i(y + s * .79f));
-        } else {
-            fillRect(new Rect(x + s * .18f, y + s * .22f, s * .64f, s * .58f), multiply(0xFF7F8FA3, tintArgb));
-            fillRect(new Rect(x + s * .25f, y + s * .29f, s * .5f, s * .12f), 0x55FFFFFF);
-        }
-    }
-
-    private static int multiply(int argb, int tint) {
-        int a = ((argb >>> 24) & 255) * ((tint >>> 24) & 255) / 255;
-        int red = ((argb >>> 16) & 255) * ((tint >>> 16) & 255) / 255;
-        int green = ((argb >>> 8) & 255) * ((tint >>> 8) & 255) / 255;
-        int blue = (argb & 255) * (tint & 255) / 255;
-        return (a << 24) | (red << 16) | (green << 8) | blue;
     }
 
     @Override public void pushClip(Rect rect) {

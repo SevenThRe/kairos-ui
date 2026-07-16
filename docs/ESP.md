@@ -43,7 +43,7 @@ TargetHUD. Its `GameVisualRenderer` is the only native hook:
 - on 1.20.1, bind IDs to `LivingEntity`/`ItemStack`, then use the version's inventory
   entity helper and item renderer through `GuiGraphics`.
 
-The included `SemanticGameVisualRenderer` produces `entity:*` and `item:*` image commands
-for previews and custom texture backends. It is a visible fallback, not a claim that a
-native player model was rendered. Keep the ID-to-native-object map endpoint-local and
-clear it after each frame so shared code never retains Minecraft objects.
+`SemanticGameVisualRenderer` produces `entity:*` and `item:*` commands for native/custom
+backends. Headless previews use `NoopGameVisualRenderer`, so they reserve the correct slots
+without drawing counterfeit player or item art. Keep the ID-to-native-object map
+endpoint-local and clear it after each frame so shared code never retains Minecraft objects.

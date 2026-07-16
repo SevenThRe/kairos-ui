@@ -12,7 +12,7 @@ import dev.kairos.ui.components.hud.HudScene;
 import dev.kairos.ui.components.hud.CombatHudProfile;
 import dev.kairos.ui.components.hud.CombatHudScene;
 import dev.kairos.ui.components.hud.EquipmentVisual;
-import dev.kairos.ui.components.hud.SemanticGameVisualRenderer;
+import dev.kairos.ui.components.hud.NoopGameVisualRenderer;
 import dev.kairos.ui.components.hud.TargetSnapshot;
 import dev.kairos.ui.esp.EspOverlayScene;
 import java.util.Arrays;
@@ -65,7 +65,7 @@ public final class RasterPreviewGenerator {
                 new EquipmentVisual("diamond_leggings", "Leggings", 75),
                 new EquipmentVisual("iron_boots", "Boots", 38)));
         CombatHudScene combatHud = new CombatHudScene(target, CombatHudProfile.competitivePixel(),
-            new SemanticGameVisualRenderer());
+            new NoopGameVisualRenderer());
         combatHud.layout(new Rect(0f, 0f, 1280f, 720f));
         AwtCanvas combatCanvas = new AwtCanvas(1280, 720);
         combatCanvas.paintBackdrop();

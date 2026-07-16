@@ -23,81 +23,88 @@ public final class CombatHudScene extends UiNode {
     @Override protected void render(UiCanvas canvas) {
         if (target == null) return;
         Rect root = getBounds();
-        renderInspector(canvas, new Rect(root.getX() + 24f, root.getY() + 34f, 262f, 154f));
-        renderCompactTarget(canvas, new Rect(root.getX() + root.getWidth() * .5f - 126f,
-            root.getBottom() - 91f, 252f, 58f));
+        renderInspector(canvas, new Rect(root.getX() + 28f, root.getY() + 34f, 310f, 178f));
+        renderCompactTarget(canvas, new Rect(root.getX() + root.getWidth() * .5f - 154f,
+            root.getBottom() - 105f, 308f, 72f));
     }
 
     private void frame(UiCanvas canvas, Rect r, int accent) {
-        canvas.fillRect(new Rect(r.getX() + 3f, r.getY() + 4f, r.getWidth(), r.getHeight()), 0x70000000);
-        canvas.fillRect(r, profile.border);
-        canvas.fillRect(inset(r, 1f), 0xFF090A0C);
+        canvas.fillRect(new Rect(r.getX() + 4f, r.getY() + 5f, r.getWidth(), r.getHeight()), 0x8A000000);
+        canvas.fillRect(r, 0xF006080B);
+        canvas.fillRect(inset(r, 1f), profile.border);
         canvas.fillRect(inset(r, 2f), profile.panel);
-        canvas.fillRect(new Rect(r.getX() + 2f, r.getY() + 2f, 3f, r.getHeight() - 4f), accent);
+        canvas.fillRect(new Rect(r.getX() + 2f, r.getY() + 2f, 2f, r.getHeight() - 4f), accent);
+        canvas.fillRect(new Rect(r.getX() + 4f, r.getY() + 2f, r.getWidth() - 6f, 1f), 0x1FFFFFFF);
     }
 
     private void renderInspector(UiCanvas canvas, Rect r) {
         int accent = target.isFriend() ? profile.friend : profile.enemy;
         frame(canvas, r, accent);
-        canvas.text(profile.font, target.isFriend() ? "F" : "R", r.getX() + 12f, r.getY() + 21f, 13f, accent);
-        canvas.text(profile.font, target.getName(), r.getX() + 29f, r.getY() + 21f, 13f, accent);
+        canvas.text(profile.font, target.isFriend() ? "F" : "R", r.getX() + 14f, r.getY() + 24f, 14f, accent);
+        canvas.text(profile.font, target.getName(), r.getX() + 34f, r.getY() + 24f, 14f, profile.text);
         String hp = String.format(Locale.ROOT, "%.1f", target.getHealth());
-        canvas.text(profile.font, hp, r.getRight() - 12f - canvas.measureText(profile.font, hp, 13f),
-            r.getY() + 21f, 13f, healthColor(target.healthRatio()));
+        canvas.text(profile.font, hp, r.getRight() - 14f - canvas.measureText(profile.font, hp, 14f),
+            r.getY() + 24f, 14f, healthColor(target.healthRatio()));
 
-        Rect portrait = new Rect(r.getX() + 12f, r.getY() + 31f, 76f, 103f);
+        Rect portrait = new Rect(r.getX() + 14f, r.getY() + 37f, 88f, 123f);
         canvas.fillRect(portrait, 0xFF08090B);
-        canvas.fillRect(inset(portrait, 1f), 0xFF23262B);
-        visuals.drawEntity(canvas, target.getEntityVisualId(), inset(portrait, 3f), 18f,
+        canvas.fillRect(inset(portrait, 1f), 0xFF20252B);
+        canvas.fillRect(new Rect(portrait.getX() + 1f, portrait.getBottom() - 27f,
+            portrait.getWidth() - 2f, 26f), 0xFF171B20);
+        visuals.drawEntity(canvas, target.getEntityVisualId(), inset(portrait, 4f), 18f,
             target.getHurtTicks() > 0 ? 0xFFFFA0A0 : 0xFFFFFFFF);
 
-        float healthHeight = 94f * target.healthRatio();
-        canvas.fillRect(new Rect(portrait.getRight() + 5f, portrait.getY(), 5f, 94f), 0xFF121417);
-        canvas.fillRect(new Rect(portrait.getRight() + 6f, portrait.getY() + 93f - healthHeight,
+        float healthHeight = 113f * target.healthRatio();
+        canvas.fillRect(new Rect(portrait.getRight() + 6f, portrait.getY(), 6f, 115f), 0xFF080A0C);
+        canvas.fillRect(new Rect(portrait.getRight() + 8f, portrait.getY() + 113f - healthHeight,
             3f, healthHeight), healthColor(target.healthRatio()));
 
         List<EquipmentVisual> armor = target.getArmor();
-        float ay = portrait.getY();
+        float ay = portrait.getY() + 1f;
         for (int i = 0; i < armor.size() && i < 4; i++) {
             EquipmentVisual item = armor.get(i);
-            visuals.drawItem(canvas, item, new Rect(r.getX() + 104f, ay, 18f, 18f), 0xFFFFFFFF);
-            canvas.text(profile.font, String.valueOf(item.getDurabilityPercent()), r.getX() + 126f,
-                ay + 13f, 8.5f, durabilityColor(item.getDurabilityPercent()));
-            ay += 22f;
+            Rect armorSlot = new Rect(r.getX() + 123f, ay, 24f, 24f);
+            canvas.fillRect(armorSlot, 0xB9080A0D);
+            visuals.drawItem(canvas, item, inset(armorSlot, 3f), 0xFFFFFFFF);
+            canvas.text(profile.font, String.valueOf(item.getDurabilityPercent()), r.getX() + 153f,
+                ay + 16f, 9.5f, durabilityColor(item.getDurabilityPercent()));
+            ay += 29f;
         }
 
-        canvas.text(profile.font, target.getHeldItem().getLabel(), r.getX() + 162f, portrait.getY() + 12f,
-            9f, profile.muted);
-        Rect item = new Rect(r.getX() + 162f, portrait.getY() + 20f, 67f, 67f);
+        float itemX = r.getX() + 194f;
+        canvas.text(profile.font, target.getHeldItem().getLabel(), itemX, portrait.getY() + 14f,
+            9.5f, profile.muted);
+        Rect item = new Rect(itemX, portrait.getY() + 24f, 78f, 78f);
         canvas.fillRect(item, 0xFF08090B);
-        canvas.fillRect(inset(item, 1f), 0xFF22252A);
-        visuals.drawItem(canvas, target.getHeldItem(), inset(item, 5f), 0xFFFFFFFF);
+        canvas.fillRect(inset(item, 1f), 0xFF20252B);
+        visuals.drawItem(canvas, target.getHeldItem(), inset(item, 8f), 0xFFFFFFFF);
         canvas.text(profile.font, String.format(Locale.ROOT, "%.1fm", target.getDistance()),
-            r.getX() + 162f, portrait.getBottom() - 4f, 9f, profile.muted);
+            itemX, portrait.getBottom() - 5f, 10f, profile.muted);
     }
 
     private void renderCompactTarget(UiCanvas canvas, Rect r) {
         int accent = target.isFriend() ? profile.friend : profile.enemy;
         frame(canvas, r, accent);
-        Rect slot = new Rect(r.getX() + 7f, r.getY() + 7f, 42f, 42f);
-        canvas.fillRect(slot, 0xFFF0F0F0);
-        visuals.drawItem(canvas, target.getHeldItem(), inset(slot, 4f), 0xFFFFFFFF);
-        canvas.text(profile.font, target.isFriend() ? "F" : "R", r.getX() + 58f, r.getY() + 18f, 11f, accent);
-        canvas.text(profile.font, target.getName(), r.getX() + 75f, r.getY() + 18f, 11f, accent);
+        Rect slot = new Rect(r.getX() + 9f, r.getY() + 9f, 52f, 52f);
+        canvas.fillRect(slot, 0xFFE8EBEF);
+        canvas.fillRect(inset(slot, 2f), 0xFFF8F9FA);
+        visuals.drawItem(canvas, target.getHeldItem(), inset(slot, 7f), 0xFFFFFFFF);
+        canvas.text(profile.font, target.isFriend() ? "F" : "R", r.getX() + 73f, r.getY() + 23f, 12f, accent);
+        canvas.text(profile.font, target.getName(), r.getX() + 91f, r.getY() + 23f, 12f, profile.text);
         canvas.text(profile.font, target.getArmor().isEmpty() ? "" : "▮", r.getRight() - 15f,
-            r.getY() + 18f, 11f, profile.friend);
+            r.getY() + 23f, 11f, profile.friend);
         String hp = String.format(Locale.ROOT, "%.1f♥", target.getHealth());
-        canvas.text(profile.font, hp, r.getX() + 58f, r.getY() + 37f, 12f, profile.text);
+        canvas.text(profile.font, hp, r.getX() + 73f, r.getY() + 45f, 13f, profile.text);
         String delta = String.format(Locale.ROOT, "%+.1f", target.healthDelta());
         int deltaColor = target.healthDelta() >= 0f ? profile.health : profile.damage;
-        canvas.text(profile.font, delta, r.getRight() - 12f - canvas.measureText(profile.font, delta, 11f),
-            r.getY() + 36f, 11f, deltaColor);
-        float barX = r.getX() + 57f;
-        float barW = r.getWidth() - 66f;
-        canvas.fillRect(new Rect(barX, r.getBottom() - 10f, barW, 5f), 0xFF3A1518);
-        canvas.fillRect(new Rect(barX, r.getBottom() - 10f, barW * target.healthRatio(), 5f),
+        canvas.text(profile.font, delta, r.getRight() - 14f - canvas.measureText(profile.font, delta, 12f),
+            r.getY() + 45f, 12f, deltaColor);
+        float barX = r.getX() + 72f;
+        float barW = r.getWidth() - 84f;
+        canvas.fillRect(new Rect(barX, r.getBottom() - 12f, barW, 7f), 0xFF351619);
+        canvas.fillRect(new Rect(barX, r.getBottom() - 12f, barW * target.healthRatio(), 7f),
             healthColor(target.healthRatio()));
-        for (int i = 1; i < 10; i++) canvas.fillRect(new Rect(barX + barW * i / 10f, r.getBottom() - 10f, 1f, 5f), 0x80000000);
+        for (int i = 1; i < 10; i++) canvas.fillRect(new Rect(barX + barW * i / 10f, r.getBottom() - 12f, 1f, 7f), 0x90000000);
     }
 
     private int healthColor(float ratio) {
