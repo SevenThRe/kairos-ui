@@ -6,6 +6,8 @@ group = "dev.kairos.ui"
 version = rootProject.version
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
 
 val engineRoot = rootProject.projectDir.parentFile
 sourceSets.main {
@@ -23,5 +25,4 @@ sourceSets.main {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release.set(8)
 }
