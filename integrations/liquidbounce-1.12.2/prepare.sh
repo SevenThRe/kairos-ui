@@ -43,5 +43,6 @@ cp "$SCRIPT_DIR/NOTICE.md" "$UPSTREAM_ROOT/shared/main/resources/META-INF/NOTICE
 
 patch --batch --forward --no-backup-if-mismatch -d "$UPSTREAM_ROOT" -p1 < "$SCRIPT_DIR/patches/command-manager.patch"
 patch --batch --forward --no-backup-if-mismatch -d "$UPSTREAM_ROOT" -p1 < "$SCRIPT_DIR/patches/thealtening-modern-api.patch"
+patch --batch --forward --no-backup-if-mismatch -d "$UPSTREAM_ROOT" -p1 < "$SCRIPT_DIR/patches/upstream-build-fixes.patch"
 
 echo "Prepared Kairos LiquidBounce integration at $UPSTREAM_ROOT"

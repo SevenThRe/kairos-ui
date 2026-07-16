@@ -1,0 +1,12 @@
+diff --git a/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/entity/MixinEntityPlayerSP.java b/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/entity/MixinEntityPlayerSP.java
+--- a/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/entity/MixinEntityPlayerSP.java
++++ b/1.12.2-Forge/src/main/java/net/ccbluex/liquidbounce/injection/forge/mixins/entity/MixinEntityPlayerSP.java
+@@ -264,7 +264,7 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
+         }
+ 
+         if(killAura.getState()) {
+-            if (killAura.getNoSwingState()) {
++            if (killAura.getNoSwingValue().get()) {
+                 callbackInfo.cancel();
+ 
+                 if (!killAura.getServerSideNoSwingValue().get())
