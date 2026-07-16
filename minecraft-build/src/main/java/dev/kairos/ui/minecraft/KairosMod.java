@@ -45,11 +45,8 @@ public final class KairosMod {
     private boolean openKeyWasDown;
 
     public KairosMod() {
-        //#if MC>=11600
-        //$$ themeDirectory = new ThemeDirectory(new File(Minecraft.getInstance().gameDirectory, "kairos-ui"));
-        //#else
-        themeDirectory = new ThemeDirectory(new File(Minecraft.getMinecraft().mcDataDir, "kairos-ui"));
-        //#endif
+        // Launchers set user.dir to the active game directory on both supported endpoints.
+        themeDirectory = new ThemeDirectory(new File(System.getProperty("user.dir"), "kairos-ui"));
         try { themeDirectory.loadInto(THEMES); }
         catch (IOException exception) { System.err.println("Kairos theme load failed: " + exception.getMessage()); }
         //#if MC>=11600
