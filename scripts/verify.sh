@@ -60,7 +60,9 @@ java -cp "$MAIN:$TEST" dev.kairos.ui.core.CoreSmokeTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.theme.ThemeSystemTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.components.ComponentSmokeTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.components.hud.NotificationCenterTest
+java -cp "$MAIN:$TEST" dev.kairos.ui.components.hud.CombatHudProfileTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.esp.EspRendererTest
+java -cp "$MAIN:$TEST" dev.kairos.ui.esp.EspStyleCodecTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.render.opengl.RenderPipelineTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.KairosGuiActivationTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.KairosClientCommandTest
@@ -90,4 +92,6 @@ test -s "$OUT/previews/workbench.png"
 test -s "$OUT/previews/panel-desktop.png"
 test -s "$OUT/previews/hud.png"
 test -s "$OUT/previews/esp.png"
+test -s "$OUT/previews/combat-hud.png"
+test -s "$OUT/previews/competitive-esp.png"
 echo "Kairos UI Engine verification passed"

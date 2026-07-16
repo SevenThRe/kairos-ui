@@ -5,18 +5,32 @@ import dev.kairos.ui.api.theme.ThemePack;
 import dev.kairos.ui.api.theme.ThemeRegistry;
 import dev.kairos.ui.api.theme.ThemeTokens;
 import dev.kairos.ui.core.node.UiNode;
+import java.util.Collections;
+import java.util.List;
 
 public final class EspOverlayScene extends UiNode {
     private final EspRenderer renderer = new EspRenderer();
     private final EspEntitySource entities;
     private final WorldToScreenProjector projector;
+    private final WorldObjectSource objects;
+    private final WorldObjectEspRenderer objectRenderer = new WorldObjectEspRenderer();
     private volatile ThemeTokens theme;
     private EspStyle style;
     private float partialTicks;
 
     public EspOverlayScene(EspEntitySource entities, WorldToScreenProjector projector, ThemeTokens theme) {
+        this(entities, projector, new WorldObjectSource() {
+            @Override public List<WorldObjectEsp> collect(float partialTicks) {
+                return Collections.emptyList();
+            }
+        }, theme);
+    }
+
+    public EspOverlayScene(EspEntitySource entities, WorldToScreenProjector projector,
+                           WorldObjectSource objects, ThemeTokens theme) {
         this.entities = entities;
         this.projector = projector;
+        this.objects = objects;
         this.theme = theme;
         this.style = EspStyle.kairosModern(theme);
     }
@@ -36,7 +50,13 @@ public final class EspOverlayScene extends UiNode {
 
     @Override protected void render(UiCanvas canvas) {
         canvas.pushClip(getBounds());
+        objectRenderer.render2d(canvas, objects.collect(partialTicks), projector);
         renderer.render(canvas, entities.collect(partialTicks), projector, style, theme);
         canvas.popClip();
+    }
+
+    /** Call from the version-specific world render event before the 2D HUD pass. */
+    public void renderWorld(WorldOverlaySink sink, boolean throughWalls) {
+        objectRenderer.render3d(objects.collect(partialTicks), sink, throughWalls);
     }
 }

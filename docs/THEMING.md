@@ -47,3 +47,18 @@ handles a folder, reloads packs, and persists the active ID.
 
 Font values are logical IDs. Preview and Minecraft backends resolve those IDs; a client
 may supply Inter, JetBrains Mono, and CJK assets through its font-atlas implementation.
+
+## Per-surface themes
+
+ClickGUI, HUD, and ESP do not have to pretend they are the same surface. The default
+combination is modern glass for menus and a hard-edged `competitive-pixel` profile for
+combat information. This keeps the menu contemporary while making the in-game overlay
+small, crisp, and readable over motion.
+
+- `examples/themes/kairos-modern.properties` controls the ClickGUI and glass HUD.
+- `examples/themes/combat-pixel-hud.properties` is loaded by `CombatHudProfileCodec`.
+- `examples/themes/competitive-esp.properties` is loaded by `EspStyleCodec`.
+
+`CombatHudScene` receives a `CombatHudProfile` and `GameVisualRenderer`; `EspOverlayScene`
+receives an `EspStyle`. A client may expose those property keys in its config UI or hot
+reload the files. The two codecs target Java 8 and do not depend on Minecraft.

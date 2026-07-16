@@ -9,6 +9,8 @@ public final class EspEntity {
     private final float distance;
     private final boolean friend;
     private final boolean invisible;
+    private final String heldItem;
+    private final int armorPercent;
 
     public EspEntity(String id, String displayName, WorldBounds bounds, float health, float maxHealth,
                      float distance, boolean friend, boolean invisible) {
@@ -21,6 +23,23 @@ public final class EspEntity {
         this.distance = distance;
         this.friend = friend;
         this.invisible = invisible;
+        this.heldItem = "";
+        this.armorPercent = -1;
+    }
+
+    public EspEntity(String id, String displayName, WorldBounds bounds, float health, float maxHealth,
+                     float distance, boolean friend, boolean invisible, String heldItem, int armorPercent) {
+        if (id == null || displayName == null || bounds == null) throw new IllegalArgumentException("entity");
+        this.id = id;
+        this.displayName = displayName;
+        this.bounds = bounds;
+        this.health = health;
+        this.maxHealth = maxHealth;
+        this.distance = distance;
+        this.friend = friend;
+        this.invisible = invisible;
+        this.heldItem = heldItem == null ? "" : heldItem;
+        this.armorPercent = Math.max(-1, Math.min(100, armorPercent));
     }
 
     public String getId() { return id; }
@@ -31,4 +50,6 @@ public final class EspEntity {
     public float getDistance() { return distance; }
     public boolean isFriend() { return friend; }
     public boolean isInvisible() { return invisible; }
+    public String getHeldItem() { return heldItem; }
+    public int getArmorPercent() { return armorPercent; }
 }

@@ -47,10 +47,11 @@ remain theme font IDs so clients can supply licensed files or their own font pro
 
 ## ESP
 
-`ui-esp` consumes immutable entity snapshots and a `WorldToScreenProjector`. It projects
-all eight AABB corners before drawing a clipped 2D overlay. Minecraft endpoints own
-entity filtering, interpolation, camera-relative matrices and render-event timing; the
-style and drawing code remain shared.
+`ui-esp` consumes immutable entity and world-object snapshots plus a
+`WorldToScreenProjector`. It projects all eight AABB corners before drawing a clipped 2D
+overlay. A separate `WorldOverlaySink` performs native 3D AABB submission. Minecraft
+endpoints own entity filtering, interpolation, camera-relative matrices, native target
+entity/item resolution, depth policy, and render-event timing; style and layout stay shared.
 
 ## Settings
 

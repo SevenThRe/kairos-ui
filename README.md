@@ -4,9 +4,10 @@ Version-independent retained-mode UI foundations for a modern Minecraft client U
 
 Kairos ships a finished modern default rather than an unstyled widget kit: blue-black
 glass surfaces, violet controls, compact floating categories, a three-column workbench,
-animated toast notifications, a right-aligned ModuleList, draggable HUD widgets, and a
-theme-aware 2D ESP renderer. Client authors can replace every palette, font ID, radius,
-spacing, blur and motion token without forking a component.
+animated toast notifications, a right-aligned ModuleList, draggable HUD widgets, a dense
+competitive TargetHUD, and entity plus world-object ESP. Client authors can replace every
+ClickGUI palette, combat-HUD profile, ESP style, font ID, radius, spacing, blur and motion
+token without forking a component.
 
 The engine supports both accepted Kairos compositions: a fixed three-column workspace
 with category navigation, module cards, and settings edited in context; and a floating
@@ -30,8 +31,8 @@ same module model, visual primitives, typography, glass effects, and theme token
 | --- | --- |
 | `ui-api` | Geometry, theme tokens, drawing and input contracts |
 | `ui-core` | Node tree, layout, focus, pointer capture and animation |
-| `ui-components` | Settings, workbench, draggable panel desktop and HUD scenes |
-| `ui-esp` | Entity snapshots, matrix projection, Full/Corner ESP, fill, health, names and distance |
+| `ui-components` | Settings, workbench, panel desktop, modern HUD and competitive combat HUD |
+| `ui-esp` | Entity/world-object snapshots, 2D projection, native 3D sink, boxes, health, equipment and tags |
 | `platform-api` | Screen, clock and render host boundary |
 | `ui-render-opengl` | Frame planning, shape batches, font atlas packing and GLSL 1.20 resources |
 | `ui-preview-awt` / `ui-preview-svg` | Deterministic headless visual preview backends |
@@ -63,9 +64,10 @@ for actual framebuffer blur, custom font atlases and batched SDF shapes.
 The PNG/SVG files are rendered by the same Java scene classes, models and `UiCanvas`
 operations used by the endpoints; they are not AI mockups. Layout, colors, content,
 sorting, clipping and render-command structure therefore reflect code that exists.
-AWT uses a deterministic block-world backdrop and a CPU blur approximation, while the
-current standalone Minecraft fallback uses the Minecraft font and a translucent rounded
-glass fallback. See [docs/PREVIEWS.md](docs/PREVIEWS.md) for the exact parity matrix.
+AWT uses a deterministic block-world backdrop, a CPU blur approximation, and semantic
+entity/item fixtures. Native entity and ItemStack pixels require the endpoint to bind
+`GameVisualRenderer`; the layout and all surrounding pixels are already the production
+scene. See [docs/PREVIEWS.md](docs/PREVIEWS.md) for the exact parity matrix.
 
 ## Guides
 
