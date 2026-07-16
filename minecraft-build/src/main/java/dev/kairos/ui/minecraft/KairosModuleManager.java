@@ -128,6 +128,14 @@ final class KairosModuleManager implements RuntimeUiModule.StateListener {
         //#endif
     }
 
+    private void restoreGamma() {
+        //#if MC<11600
+        if (!gammaCaptured) return;
+        Minecraft.getMinecraft().gameSettings.gammaSetting = previousGamma;
+        gammaCaptured = false;
+        //#endif
+    }
+
     //#if MC<11600
     private void applyGamma(Minecraft minecraft) {
         if (!gammaCaptured) {
@@ -135,12 +143,6 @@ final class KairosModuleManager implements RuntimeUiModule.StateListener {
             gammaCaptured = true;
         }
         minecraft.gameSettings.gammaSetting = 16f;
-    }
-
-    private void restoreGamma() {
-        if (!gammaCaptured) return;
-        Minecraft.getMinecraft().gameSettings.gammaSetting = previousGamma;
-        gammaCaptured = false;
     }
 
     private void setRightClickDelay(Minecraft minecraft, int delay) {
@@ -264,8 +266,6 @@ final class KairosModuleManager implements RuntimeUiModule.StateListener {
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
-    //#else
-    private void restoreGamma() {}
     //#endif
 
     private boolean enabled(String id) {
