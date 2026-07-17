@@ -56,6 +56,10 @@ frames and packed `glTexSubImage2D` calls for partial frames, restoring texture 
 and every modified `GL_UNPACK_*` value. The CEF callback never calls OpenGL and the GL
 thread never waits while the producer copies pixels.
 
+CEF popup surfaces (including HTML select menus) use a separate mailbox and are clipped
+and composited into the main texture. Closing a popup discards its pending frame and
+invalidates the page so the area underneath is repainted.
+
 `KairosStateSync` scans module state at 20 Hz and sends revisioned Java-to-JavaScript
 patches. This covers toggles made by keybinds or commands, not only clicks originating in
 the page. Value changes request a full bridge refresh at 4 Hz. JavaScript-to-Java calls

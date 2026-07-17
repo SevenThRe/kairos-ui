@@ -31,6 +31,7 @@ import org.lwjgl.input.Keyboard;
 public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBrowser {
     private final CefRenderer renderer_;
     private final PixelFrameMailbox frameMailbox_ = new PixelFrameMailbox();
+    private final PixelFrameMailbox popupMailbox_ = new PixelFrameMailbox();
     private final Rectangle browser_rect_ = new Rectangle(0, 0, 1, 1);
     private final Point screenPoint_ = new Point(0, 0);
     private final boolean isTransparent_;
@@ -72,6 +73,7 @@ public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBr
     @Override
     public void onPopupShow(CefBrowser browser, boolean show) {
         if (!show) {
+            popupMailbox_.discardPending();
             renderer_.clearPopupRects();
             invalidate();
         }
@@ -82,8 +84,6 @@ public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBr
     @Override
     public void onPaint(CefBrowser browser, boolean popup, Rectangle[] dirtyRects,
                         ByteBuffer buffer, int width, int height) {
-        if (popup) return;
-
         List<DirtyRect> damage = new ArrayList<DirtyRect>();
         if (dirtyRects != null) {
             for (Rectangle rect : dirtyRects) {
@@ -91,7 +91,7 @@ public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBr
             }
         }
         try {
-            frameMailbox_.publish(buffer, width, height, damage, false);
+            (popup ? popupMailbox_ : frameMailbox_).publish(buffer, width, height, damage, false);
         } catch (RuntimeException exception) {
             Log.warning("Kairos skipped invalid CEF paint data: " + exception.getMessage());
         }
@@ -105,6 +105,14 @@ public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBr
                 renderer_.onFrame(lease.frame());
             } finally {
                 lease.close();
+            }
+        }
+        PixelFrameMailbox.Lease popupLease = popupMailbox_.acquireLatest();
+        if (popupLease != null) {
+            try {
+                renderer_.onPopupFrame(popupLease.frame());
+            } finally {
+                popupLease.close();
             }
         }
         sendMouseEvent(lastMouseEvent);

@@ -132,13 +132,57 @@ public class CefRenderer {
         }
     }
 
-    protected void onPopupSize(Rectangle rect) {
+    /** Composites CEF's separately painted popup surface into the main texture. */
+    protected void onPopupFrame(PixelFrame frame) {
+        Rectangle popup = popupRectSnapshot();
+        if (frame == null || frame.patches().isEmpty() || popup.width <= 0 || popup.height <= 0
+            || view_width_ <= 0 || view_height_ <= 0 || texture_id_[0] == 0) return;
+
+        int oldBinding = glGetInteger(GL_TEXTURE_BINDING_2D);
+        int oldAlignment = glGetInteger(GL_UNPACK_ALIGNMENT);
+        int oldRowLength = glGetInteger(GL_UNPACK_ROW_LENGTH);
+        int oldSkipPixels = glGetInteger(GL_UNPACK_SKIP_PIXELS);
+        int oldSkipRows = glGetInteger(GL_UNPACK_SKIP_ROWS);
+
+        try {
+            GlStateManager.bindTexture(texture_id_[0]);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+            for (PixelFrame.Patch patch : frame.patches()) {
+                DirtyRect rect = patch.rect();
+                int destinationX = popup.x + rect.x();
+                int destinationY = popup.y + rect.y();
+                int skipX = Math.max(0, -destinationX);
+                int skipY = Math.max(0, -destinationY);
+                int clippedX = Math.max(0, destinationX);
+                int clippedY = Math.max(0, destinationY);
+                int clippedWidth = Math.min(rect.width() - skipX, view_width_ - clippedX);
+                int clippedHeight = Math.min(rect.height() - skipY, view_height_ - clippedY);
+                if (clippedWidth <= 0 || clippedHeight <= 0) continue;
+
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, rect.width());
+                glPixelStorei(GL_UNPACK_SKIP_PIXELS, skipX);
+                glPixelStorei(GL_UNPACK_SKIP_ROWS, skipY);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, clippedX, clippedY, clippedWidth, clippedHeight,
+                    EXTBgra.GL_BGRA_EXT, GL_UNSIGNED_BYTE, frame.pixels(patch));
+            }
+        } finally {
+            glPixelStorei(GL_UNPACK_ALIGNMENT, oldAlignment);
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, oldRowLength);
+            glPixelStorei(GL_UNPACK_SKIP_PIXELS, oldSkipPixels);
+            glPixelStorei(GL_UNPACK_SKIP_ROWS, oldSkipRows);
+            GlStateManager.bindTexture(oldBinding);
+        }
+    }
+
+    protected synchronized void onPopupSize(Rectangle rect) {
         if (rect.width <= 0 || rect.height <= 0) return;
-        original_popup_rect_ = rect;
+        original_popup_rect_ = new Rectangle(rect);
         popup_rect_ = getPopupRectInWebView(original_popup_rect_);
     }
 
-    protected Rectangle getPopupRectInWebView(Rectangle rect) {
+    protected Rectangle getPopupRectInWebView(Rectangle source) {
+        Rectangle rect = new Rectangle(source);
         if (rect.x < 0) rect.x = 0;
         if (rect.y < 0) rect.y = 0;
         if (rect.x + rect.width > view_width_) rect.x = view_width_ - rect.width;
@@ -148,9 +192,13 @@ public class CefRenderer {
         return rect;
     }
 
-    protected void clearPopupRects() {
+    protected synchronized void clearPopupRects() {
         popup_rect_.setBounds(0, 0, 0, 0);
         original_popup_rect_.setBounds(0, 0, 0, 0);
+    }
+
+    private synchronized Rectangle popupRectSnapshot() {
+        return new Rectangle(popup_rect_);
     }
 
     public int getViewWidth() { return view_width_; }

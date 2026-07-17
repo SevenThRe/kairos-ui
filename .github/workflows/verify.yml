@@ -48,11 +48,11 @@ jobs:
       - name: Verify combined JAR
         run: |
           chmod +x scripts/verify-liquidbounce-jar.sh
-          ./scripts/verify-liquidbounce-jar.sh liquidbounce/1.12.2-Forge/build/libs/Kairos-LiquidBounce-1.12.2-b73-kairos-r2.jar
+          ./scripts/verify-liquidbounce-jar.sh liquidbounce/1.12.2-Forge/build/libs/Kairos-LiquidBounce-1.12.2-b73-kairos-r3.jar
           mkdir -p dist
-          cp liquidbounce/1.12.2-Forge/build/libs/Kairos-LiquidBounce-1.12.2-b73-kairos-r2.jar dist/
+          cp liquidbounce/1.12.2-Forge/build/libs/Kairos-LiquidBounce-1.12.2-b73-kairos-r3.jar dist/
       - uses: actions/upload-artifact@v4
         with:
-          name: Kairos-LiquidBounce-1.12.2-b73-kairos-r2
-          path: dist/Kairos-LiquidBounce-1.12.2-b73-kairos-r2.jar
+          name: Kairos-LiquidBounce-1.12.2-b73-kairos-r3
+          path: dist/Kairos-LiquidBounce-1.12.2-b73-kairos-r3.jar
           if-no-files-found: error

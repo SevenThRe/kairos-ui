@@ -9,6 +9,7 @@ public final class PixelFrameMailboxTest {
         copiesOnlyDirtyPixelsAfterFirstFrame();
         mergesDamageWhenPendingFrameIsDropped();
         promotesLargeDamageToFullFrame();
+        discardsHiddenPopupFrame();
         System.out.println("PixelFrameMailboxTest passed");
     }
 
@@ -51,6 +52,14 @@ public final class PixelFrameMailboxTest {
         DirtyRegionPlanner.Plan plan = planner.plan(10, 10,
             Arrays.asList(new DirtyRect(0, 0, 5, 10), new DirtyRect(9, 9, 1, 1)), false);
         check(plan.isFull(), "damage over the configured threshold must become full");
+    }
+
+    private static void discardsHiddenPopupFrame() {
+        PixelFrameMailbox mailbox = new PixelFrameMailbox();
+        mailbox.publish(pixels(2, 2), 2, 2,
+            Collections.singletonList(new DirtyRect(0, 0, 2, 2)), true);
+        mailbox.discardPending();
+        check(mailbox.acquireLatest() == null, "discard must remove a pending popup frame");
     }
 
     private static ByteBuffer pixels(int width, int height) {

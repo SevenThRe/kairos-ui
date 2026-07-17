@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(
     modid = KairosBootstrap.MOD_ID,
     name = "Kairos UI",
-    version = "1.12.2-b73-kairos-r2",
+    version = "1.12.2-b73-kairos-r3",
     clientSideOnly = true,
     dependencies = "after:mcef"
 )

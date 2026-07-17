@@ -93,6 +93,14 @@ public final class PixelFrameMailbox {
         return new Lease(this, slot);
     }
 
+    /** Drops a no-longer-visible popup frame without touching an in-flight lease. */
+    public synchronized void discardPending() {
+        if (ready == null) return;
+        ready.frame = null;
+        free.addLast(ready);
+        ready = null;
+    }
+
     private synchronized void release(Slot slot) {
         slot.frame = null;
         free.addLast(slot);
