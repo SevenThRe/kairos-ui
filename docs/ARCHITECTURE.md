@@ -20,8 +20,9 @@ The deleted Minecraft canvas is not a fallback path; WebView failure is reported
 Dependencies point inward: Minecraft/loader → platform adapter → `platform-api` →
 `ui-components` → `ui-core` → `ui-api`.
 
-Core code cannot import Minecraft or a loader. The concrete MCEF/LiquidBounce host stays
-in `integrations/liquidbounce-1.12.2`. A CI source scan enforces the initial
+Core code cannot import Minecraft or a loader. `web-surface-core` defines `WebSurface`,
+damage planning and the thread handoff without importing CEF, Minecraft or LWJGL. The
+concrete MCEF/LiquidBounce host stays in `integrations/liquidbounce-1.12.2`. A CI source scan enforces the initial
 rule; later it should be replaced with an ArchUnit test.
 
 ## Rendering
@@ -40,6 +41,25 @@ Capability levels:
 
 The ClickGUI does not use this capability ladder: Chromium owns its layout and text,
 while the endpoint owns the Minecraft framebuffer blur behind its transparent surface.
+
+### Browser pixel path
+
+The Java 8 endpoint embeds the pinned 1.12.2 MCEF runtime, but replaces MCEF's stock OSR
+staging and uploader classes. CEF's paint callback supplies a full BGRA view plus damage
+rectangles. Kairos clamps and coalesces those rectangles, copies only their rows into a
+packed three-slot mailbox, and keeps the newest frame. When a waiting frame is replaced,
+its damage is merged into the new frame so the GL texture cannot miss an update. Damage
+above 42% of the surface or a resize becomes one full upload.
+
+The render tick is the sole GPU consumer. It uses `glTexImage2D` for allocation/full
+frames and packed `glTexSubImage2D` calls for partial frames, restoring texture binding
+and every modified `GL_UNPACK_*` value. The CEF callback never calls OpenGL and the GL
+thread never waits while the producer copies pixels.
+
+`KairosStateSync` scans module state at 20 Hz and sends revisioned Java-to-JavaScript
+patches. This covers toggles made by keybinds or commands, not only clicks originating in
+the page. Value changes request a full bridge refresh at 4 Hz. JavaScript-to-Java calls
+remain origin checked, whitelisted and scheduled onto Minecraft's client thread.
 
 ## Fonts
 

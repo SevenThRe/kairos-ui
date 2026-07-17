@@ -4,12 +4,12 @@ import net.ccbluex.liquidbounce.LiquidBounce;
 import net.ccbluex.liquidbounce.features.module.Module;
 import net.ccbluex.liquidbounce.value.BoolValue;
 import net.ccbluex.liquidbounce.value.Value;
+import dev.kairos.ui.web.WebSurface;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.montoyo.mcef.api.API;
-import net.montoyo.mcef.api.IBrowser;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -18,7 +18,8 @@ public final class KairosScreen extends GuiScreen {
     private static final long OPEN_KEY_GUARD_MS = 180L;
 
     private final long openedAt = System.currentTimeMillis();
-    private IBrowser browser;
+    private WebSurface surface;
+    private final KairosStateSync stateSync = new KairosStateSync();
     private boolean ownsBlurShader;
 
     @Override
@@ -30,9 +31,9 @@ public final class KairosScreen extends GuiScreen {
             return;
         }
 
-        if (browser == null) {
+        if (surface == null) {
             try {
-                browser = api.createBrowser(KairosWebBridge.UI_URL, true);
+                surface = new McefWebSurface(api, KairosWebBridge.UI_URL);
             } catch (Throwable throwable) {
                 reportFailure("MCEF browser creation failed: " + throwable.getClass().getSimpleName());
                 mc.displayGuiScreen(null);
@@ -40,8 +41,8 @@ public final class KairosScreen extends GuiScreen {
             }
         }
 
-        if (browser != null) {
-            browser.resize(mc.displayWidth, mc.displayHeight);
+        if (surface != null) {
+            surface.resize(mc.displayWidth, mc.displayHeight);
         }
 
         if (blurEnabled() && !mc.entityRenderer.isShaderActive()) {
@@ -58,15 +59,17 @@ public final class KairosScreen extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        if (browser == null) {
+        if (surface == null) {
             return;
         }
+
+        stateSync.tick(surface);
 
         GlStateManager.disableDepth();
         GlStateManager.enableBlend();
         GlStateManager.enableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        browser.draw(0.0D, height, width, 0.0D);
+        surface.render(0.0D, height, width, 0.0D);
         GlStateManager.disableBlend();
         GlStateManager.enableDepth();
     }
@@ -88,23 +91,23 @@ public final class KairosScreen extends GuiScreen {
                 return;
             }
 
-            if (browser == null) {
+            if (surface == null) {
                 continue;
             }
 
             int modifiers = keyboardModifiers();
             if (pressed) {
-                browser.injectKeyPressedByKeyCode(keyCode, character, modifiers);
+                surface.keyPressed(keyCode, character, modifiers);
                 if (character != 0) {
-                    browser.injectKeyTyped(character, modifiers);
+                    surface.keyTyped(character, modifiers);
                 }
             } else {
-                browser.injectKeyReleasedByKeyCode(keyCode, character, modifiers);
+                surface.keyReleased(keyCode, character, modifiers);
             }
         }
 
         while (Mouse.next()) {
-            if (browser == null) {
+            if (surface == null) {
                 continue;
             }
 
@@ -116,11 +119,11 @@ public final class KairosScreen extends GuiScreen {
             int modifiers = keyboardModifiers();
 
             if (wheel != 0) {
-                browser.injectMouseWheel(x, y, modifiers, 1, wheel);
+                surface.mouseWheel(x, y, modifiers, wheel);
             } else if (button == -1) {
-                browser.injectMouseMove(x, y, modifiers, false);
+                surface.mouseMove(x, y, modifiers);
             } else {
-                browser.injectMouseButton(x, y, modifiers, button + 1, pressed, 1);
+                surface.mouseButton(x, y, modifiers, button + 1, pressed);
             }
         }
     }
@@ -128,9 +131,9 @@ public final class KairosScreen extends GuiScreen {
     @Override
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(false);
-        if (browser != null) {
-            browser.close();
-            browser = null;
+        if (surface != null) {
+            surface.close();
+            surface = null;
         }
         if (ownsBlurShader) {
             mc.entityRenderer.stopUseShader();
@@ -174,4 +177,3 @@ public final class KairosScreen extends GuiScreen {
         System.err.println("[Kairos] " + message);
     }
 }
-

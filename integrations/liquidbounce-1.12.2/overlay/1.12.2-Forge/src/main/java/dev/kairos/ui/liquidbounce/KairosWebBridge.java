@@ -129,7 +129,7 @@ final class KairosWebBridge implements IJSQueryHandler {
 
     private JsonObject state() {
         JsonObject root = new JsonObject();
-        root.addProperty("version", "b73 · Kairos r1");
+        root.addProperty("version", "b73 · Kairos r2");
         root.addProperty("minecraft", "1.12.2 Forge");
         root.addProperty("player", Minecraft.getMinecraft().getSession().getUsername());
         root.addProperty("prefix", String.valueOf(LiquidBounce.INSTANCE.getCommandManager().getPrefix()));
@@ -330,4 +330,3 @@ final class KairosWebBridge implements IJSQueryHandler {
         return Math.max(min, Math.min(max, value));
     }
 }
-

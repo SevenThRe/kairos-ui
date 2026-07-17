@@ -12,7 +12,9 @@ The production Forge 1.12.2 artifact now uses the GPL LiquidBounce b73 1.12.2 po
 its client runtime. Kairos is connected directly to its real `ModuleManager`, module
 states and `Value` objects. The earlier standalone demo module catalog and native
 ClickGUI have been removed from the deliverable. MCEF and its shutdown coremod are
-embedded in the same Forge JAR, so there is no separate `mcef` mod dependency.
+embedded in the same Forge JAR, so there is no separate `mcef` mod dependency. MCEF is
+not exposed as Kairos' engine API: `web-surface-core` owns the renderer-neutral surface,
+packed dirty frames and latest-frame-wins handoff, while the 1.12.2 adapter is private.
 
 ## Design constraints
 
@@ -35,6 +37,7 @@ embedded in the same Forge JAR, so there is no separate `mcef` mod dependency.
 | `ui-esp` | Entity/world-object snapshots, 2D projection, native 3D sink, boxes, health, equipment and tags |
 | `platform-api` | Screen, clock and render host boundary |
 | `ui-render-opengl` | Frame planning, shape batches, font atlas packing and GLSL 1.20 resources |
+| `web-surface-core` | Java 8 `WebSurface`, dirty-rectangle planner and three-slot packed pixel mailbox |
 | `ui-preview-awt` / `ui-preview-svg` | Deterministic headless visual preview backends |
 | `platform-1.12.2-forge` | Tested LWJGL2 coordinate, key and scissor conversion |
 | `platform-1.20.1-common` | Tested GLFW coordinate, key and scissor conversion |
@@ -76,7 +79,7 @@ The shared engine has no external runtime dependencies. On a JDK:
 ./scripts/verify.sh
 ```
 
-The script compiles with `--release 8`, runs engine, component, renderer and endpoint
+The script compiles with `--release 8`, runs engine, browser mailbox, component, renderer and endpoint
 mapping tests, checks both preprocessor branches, scans shared sources for forbidden
 platform imports, and emits PNG/SVG previews under `out/verify/previews`.
 

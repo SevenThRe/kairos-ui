@@ -53,7 +53,7 @@ idea {
 }
 
 archivesBaseName = 'Kairos-LiquidBounce'
-version = '1.12.2-b73-kairos-r1'
+version = '1.12.2-b73-kairos-r2'
 
 minecraft {
     version = "1.12.2-14.23.5.2768"
@@ -156,6 +156,10 @@ shadowJar {
         exclude 'mcmod.info'
         exclude 'net/montoyo/mcef/coremod/**'
         exclude 'assets/mcef/letsencryptauthorityx3.crt'
+        // Kairos owns the OSR pixel handoff and GL uploader. Do not package
+        // MCEF's single-buffer/full-copy implementations beside our overlays.
+        exclude 'org/cef/browser/CefBrowserOsr*.class'
+        exclude 'org/cef/browser/CefRenderer*.class'
     }
     from('../LICENSE') {
         into 'META-INF'

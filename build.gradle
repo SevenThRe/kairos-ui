@@ -51,6 +51,10 @@ project(':ui-render-opengl') {
     }
 }
 
+project(':web-surface-core') {
+    dependencies { }
+}
+
 project(':ui-preview-svg') {
     dependencies { api project(':ui-api') }
 }

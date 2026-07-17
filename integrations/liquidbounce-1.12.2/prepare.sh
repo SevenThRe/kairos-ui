@@ -2,6 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPOSITORY_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 UPSTREAM_ROOT="${1:-}"
 MCEF_JAR="${2:-}"
 EXPECTED_COMMIT="23e11be9b078a931edc68078f4be62a1c48724a5"
@@ -38,6 +39,7 @@ mkdir -p "$UPSTREAM_ROOT/1.12.2-Forge/libs"
 cp "$MCEF_JAR" "$UPSTREAM_ROOT/1.12.2-Forge/libs/mcef-1.12.2-1.11-api.jar"
 cp -R "$SCRIPT_DIR/overlay/1.12.2-Forge/." "$UPSTREAM_ROOT/1.12.2-Forge/"
 cp -R "$SCRIPT_DIR/overlay/shared/." "$UPSTREAM_ROOT/shared/"
+cp -R "$REPOSITORY_ROOT/web-surface-core/src/main/java/." "$UPSTREAM_ROOT/shared/main/java/"
 mkdir -p "$UPSTREAM_ROOT/shared/main/resources/META-INF"
 cp "$SCRIPT_DIR/NOTICE.md" "$UPSTREAM_ROOT/shared/main/resources/META-INF/NOTICE-Kairos-LiquidBounce.md"
 

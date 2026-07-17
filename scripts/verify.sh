@@ -21,6 +21,7 @@ mapfile -t MAIN_SOURCES < <(find \
   "$ROOT/ui-esp/src/main/java" \
   "$ROOT/platform-api/src/main/java" \
   "$ROOT/ui-render-opengl/src/main/java" \
+  "$ROOT/web-surface-core/src/main/java" \
   "$ROOT/ui-preview-svg/src/main/java" \
   "$ROOT/ui-preview-awt/src/main/java" \
   "$ROOT/platform-1.12.2-forge/src/main/java" \
@@ -35,6 +36,7 @@ mapfile -t TEST_SOURCES < <(find \
   "$ROOT/ui-components/src/test/java" \
   "$ROOT/ui-esp/src/test/java" \
   "$ROOT/ui-render-opengl/src/test/java" \
+  "$ROOT/web-surface-core/src/test/java" \
   "$ROOT/platform-api/src/test/java" \
   "$ROOT/platform-1.12.2-forge/src/test/java" \
   "$ROOT/platform-1.20.1-common/src/test/java" \
@@ -64,6 +66,7 @@ java -cp "$MAIN:$TEST" dev.kairos.ui.components.hud.CombatHudProfileTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.esp.EspRendererTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.esp.EspStyleCodecTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.render.opengl.RenderPipelineTest
+java -cp "$MAIN:$TEST" dev.kairos.ui.web.PixelFrameMailboxTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.KairosGuiActivationTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.KairosClientCommandTest
 java -cp "$MAIN:$TEST" dev.kairos.ui.platform.ThemeDirectoryTest

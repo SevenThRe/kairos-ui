@@ -6,13 +6,16 @@ does not contain a native ClickGUI fallback.
 The reproducible build:
 
 1. clones the pinned GPL-3.0 LiquidBounce 1.12.2 source revision;
-2. replaces its `ClickGUI` module with the Kairos MCEF screen;
+2. replaces its `ClickGUI` module with a Kairos `WebSurface` screen backed privately by MCEF;
 3. exposes the live LiquidBounce `ModuleManager`, module states, keybinds and
    `Value` objects to the bundled HTML/CSS/JavaScript UI;
 4. adds the configurable-prefix `kairos gui` command and binds Right Control by
    default;
 5. embeds MCEF 1.12.2-1.11 and its shutdown coremod into the same Forge JAR;
-6. includes the complete upstream module implementation, HUD and render modules.
+6. replaces MCEF's stock full-frame CPU copy/single staging buffer with Kairos packed
+   dirty regions, a three-slot latest-frame mailbox and GL-thread-only uploads;
+7. pushes keybind/command state changes back into the page with revisioned patches;
+8. includes the complete upstream module implementation, HUD and render modules.
 
 At runtime, press Right Control or enter `.kairos gui`. If the LiquidBounce
 command prefix was changed, the same command uses that prefix automatically.
@@ -34,5 +37,4 @@ JAVA_HOME=/path/to/jdk8 /tmp/lb112/gradlew -p /tmp/lb112 :1.12.2-Forge:build
 ```
 
 GitHub Actions performs the same pinned build and validates the single JAR's
-LiquidBounce modules, Kairos bridge/assets, MCEF implementation and nested coremod.
-
+LiquidBounce modules, Kairos bridge/assets, patched CEF OSR classes and nested coremod.

@@ -5,6 +5,8 @@
   var selectedCategory = "all";
   var selectedModule = null;
   var searchQuery = "";
+  var stateRevision = -1;
+  var pendingPatches = [];
   var themes = [
     { id: "violet", value: "ObsidianViolet" },
     { id: "cyan", value: "NeonCyan" },
@@ -58,7 +60,30 @@
     document.documentElement.setAttribute("data-animations", next.animations === false ? "off" : "on");
     errorNode.hidden = true;
     if (selectedModule && !findModule(selectedModule)) selectedModule = null;
+    if (pendingPatches.length) {
+      var queued = pendingPatches;
+      pendingPatches = [];
+      queued.forEach(applyPatch);
+    }
     render();
+  }
+
+  function applyPatch(patch) {
+    if (!patch || typeof patch.revision !== "number" || patch.revision <= stateRevision) return;
+    if (!model) {
+      pendingPatches.push(patch);
+      return;
+    }
+    stateRevision = patch.revision;
+    (patch.modules || []).forEach(function (change) {
+      var module = findModule(change.id);
+      if (module) module.enabled = !!change.enabled;
+    });
+    render();
+  }
+
+  function requestRefresh() {
+    query({ type: "refresh" }, receive);
   }
 
   function findModule(id) {
@@ -318,7 +343,7 @@
     setSetting("ClickGUI", "Theme", next.value);
   };
 
-  window.Kairos = { receiveState: receive, refresh: function () { query({ type: "refresh" }, receive); } };
+  window.KairosRuntime = { applyPatch: applyPatch, requestRefresh: requestRefresh };
+  window.Kairos = { receiveState: receive, refresh: requestRefresh };
   query({ type: "bootstrap" }, receive);
 }());
-

@@ -24,6 +24,12 @@ require_entry "net/ccbluex/liquidbounce/features/module/modules/world/Scaffold.c
 require_entry "dev/kairos/ui/liquidbounce/KairosBootstrap.class"
 require_entry "dev/kairos/ui/liquidbounce/KairosScreen.class"
 require_entry "dev/kairos/ui/liquidbounce/KairosWebBridge.class"
+require_entry "dev/kairos/ui/liquidbounce/McefWebSurface.class"
+require_entry "dev/kairos/ui/liquidbounce/KairosStateSync.class"
+require_entry "dev/kairos/ui/web/WebSurface.class"
+require_entry "dev/kairos/ui/web/PixelFrameMailbox.class"
+require_entry "org/cef/browser/CefBrowserOsr.class"
+require_entry "org/cef/browser/CefRenderer.class"
 require_entry "net/montoyo/mcef/MCEF.class"
 require_entry "net/montoyo/mcef/api/MCEFApi.class"
 require_entry "org/cef/CefApp.class"
@@ -57,6 +63,15 @@ fi
 if grep -Fqi 'required-after:mcef' < <(unzip -p "$JAR" mcmod.info); then
   echo "combined JAR still declares MCEF as an external required mod" >&2
   exit 5
+fi
+
+if ! unzip -p "$JAR" org/cef/browser/CefBrowserOsr.class | strings | grep -Fq 'PixelFrameMailbox'; then
+  echo "final JAR contains MCEF's stock single-buffer CefBrowserOsr" >&2
+  exit 8
+fi
+if ! unzip -p "$JAR" org/cef/browser/CefRenderer.class | strings | grep -Fq 'onFrame'; then
+  echo "final JAR does not contain the Kairos dirty-region GL uploader" >&2
+  exit 8
 fi
 
 COREMOD="$(mktemp)"
